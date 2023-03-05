@@ -1,0 +1,100 @@
+footer {
+  padding: 3.75rem 0;
+  background: $primaryBlack;
+
+  .logo {
+    svg {
+      width: 10rem;
+      height: auto;
+
+      path {
+        fill: $primaryWhite;
+      }
+    }
+
+  }
+
+  .contact{
+    margin-bottom: 2.5rem;
+  }
+
+  .alebo {
+    margin-bottom: 1.5rem;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 15px;
+    letter-spacing: 0.07em;
+    color: $tertiaryBlack;
+    display: block;
+  }
+
+
+  .part {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    text-transform: uppercase;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .bolded {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.25rem;
+      color: $primaryWhite;
+      display: flex;
+      align-items: center;
+
+      &::after {
+        content: "";
+        background: $tertiaryBlack;
+        width: 2.7rem;
+        height: 2px;
+        border-radius: 2px;
+        display: block;
+        margin: 0 1.5rem;
+      }
+    }
+
+    .values {
+      .value {
+        display: block;
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 1.25rem;
+        letter-spacing: 0.07em;
+        color: $tertiaryWhite;
+        margin-bottom: 1.5rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+  .copyright {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 0.9375rem;
+    letter-spacing: 0.07em;
+    margin-top: 3rem;
+    color: $tertiaryBlack;
+  }
+
+
+  @include media-breakpoint-down(md) {
+    .logo{
+      margin-bottom: 3rem;
+    }
+    .part {
+      margin-bottom: 1.5rem;
+      display: block;
+
+      .values {
+        margin-top: 1rem;
+      }
+    }
+  }
+}

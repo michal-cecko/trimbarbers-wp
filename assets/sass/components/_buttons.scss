@@ -1,0 +1,63 @@
+.btn{
+  padding: 0.675rem 1.7rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  cursor: pointer;
+  letter-spacing: 0.07em;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  &.btn-primary{
+    &.btn-solid{
+      background: $primaryColor;
+      color: $primaryWhite;
+      @media (hover: hover) {
+        &:hover{
+          background: $primaryColorHovered;
+        }
+      }
+    }
+    &.btn-outline{
+      border: 0.1875rem solid $primaryColor;
+      color: $primaryColor;
+      @media (hover: hover) {
+        &:hover{
+          background: $primaryColor;
+          color: $primaryWhite;
+        }
+      }
+    }
+  }
+  &.btn-secondary{
+    &.btn-solid{
+      background: $primaryBlack;
+      color: $primaryWhite;
+      @media (hover: hover) {
+        &:hover{
+          background: $primaryBlack;
+        }
+      }
+    }
+    &.btn-outline{
+      border: 0.1875rem solid $primaryBlack;
+      color: $primaryBlack;
+      @media (hover: hover) {
+        &:hover{
+          background: $primaryBlack;
+          color: $primaryWhite;
+        }
+      }
+    }
+  }
+  @media (hover: hover) {
+    &:hover{
+      transform: scale(1.1);
+    }
+  }
+}

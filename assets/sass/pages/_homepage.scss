@@ -1,0 +1,471 @@
+// INTRO SECTION ---- START
+
+#introSection {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  z-index: 1;
+
+  .media-bg-wrapper {
+    position: absolute;
+    left: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    background: $secondaryWhite;
+
+    video,
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+      z-index: 2;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba($secondaryWhite, 0.75);
+      z-index: 3;
+    }
+  }
+
+  .content-container {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+
+    .intro-logo {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+
+      path {
+        fill: $primaryBlack
+      }
+    }
+
+    .intro-text {
+      position: absolute;
+      left: 1rem;
+      bottom: 8vh;
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 1.0625rem;
+      letter-spacing: 0.07em;
+      color: $primaryBlack;
+      text-transform: uppercase;
+      max-width: 60vw;
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    .content-container {
+      .intro-logo {
+        width: 12rem;
+        height: auto;
+
+        path {
+          fill: $primaryBlack
+        }
+      }
+
+      .intro-text {
+        display: none;
+      }
+    }
+  }
+}
+
+// INTRO SECTION ---- END
+
+
+// SERVICES SECTION ---- START
+
+#servicesSection {
+  padding: 6.25rem 0;
+
+  .text-container {
+    padding-left: 2rem;
+
+    .handwritten {
+      transform: rotate(-8.18deg);
+    }
+
+    .heading-container {
+      .text {
+        margin-top: 1.2rem;
+        padding-left: 2.5rem;
+        width: 70%;
+      }
+    }
+
+    margin-bottom: 5rem;
+  }
+
+  .services-container {
+    .services {
+      padding-right: 5rem;
+
+      .service {
+        display: grid;
+        grid-template-columns: 30% 63% 7%;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 0.0625rem solid $borderWhite;
+
+        .name,
+        .price {
+          font-size: 1.5rem;
+          font-weight: 700;
+          line-height: 1.8125rem;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+        }
+
+        .price {
+          text-align: right;
+        }
+
+        .description {
+          padding: 0 0.5rem;
+        }
+
+        &:last-child {
+          border-bottom: 0;
+        }
+      }
+    }
+
+    .image {
+      .img-container {
+        width: 100%;
+        height: 35rem;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    padding: 2.5rem 0 0 0;
+
+    .text-container {
+      padding-left: 0;
+
+      .handwritten {
+        font-size: 4rem;
+      }
+
+      .heading-container {
+        .text {
+          padding-left: 0;
+          width: 100%;
+        }
+      }
+
+      margin-bottom: 3rem;
+    }
+
+    .services-container {
+      .services {
+        padding-right: 0.5rem;
+        margin-bottom: 3rem;
+
+        .service {
+          display: grid;
+          grid-template-columns: auto;
+          grid-template-areas: 'name name name price'
+                                'desc desc desc desc';
+          padding: 1rem 0;
+          border-bottom: 0.0625rem solid $borderWhite;
+
+          .name {
+            grid-area: name;
+          }
+
+          .price {
+            grid-area: price;
+          }
+
+          .description {
+            margin-top: 0.5rem;
+            grid-area: desc;
+            padding: 0;
+          }
+
+          .name,
+          .price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.52375rem;
+            letter-spacing: 0.07em;
+          }
+
+          &:last-child {
+            border-bottom: 0;
+          }
+        }
+      }
+
+      .image {
+        .img-container {
+          height: 25rem;
+          width: 100vw;
+          transform: translateX(-1rem);
+        }
+      }
+    }
+  }
+}
+
+// SERVICES SECTION ---- END
+
+
+// INSTAGRAM SECTION ---- START
+
+#instagramSection {
+  padding-top: 7.5rem;
+
+  &::before {
+    content: "";
+    display: block;
+    z-index: 0;
+    position: absolute;
+    width: 100%;
+    height: 85%;
+    left: 0;
+    top: 0;
+    background: $primaryBlack;
+  }
+
+  .container {
+    z-index: 1;
+    position: relative;
+  }
+
+  .text-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5.625rem;
+
+    .handwritten {
+      color: #545454;
+      transform: rotate(5.79deg);
+      font-size: 3.125rem;
+    }
+
+    .heading-container {
+      .heading {
+        font-size: 2.375rem;
+
+        &:last-child {
+          margin-left: 2rem;
+          margin-top: 0.5rem;
+        }
+      }
+    }
+  }
+
+  .swiper-gallery-container {
+    .swiper-arrows {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .arrow {
+      width: 4.0625rem;
+      height: 4.0625rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+      background: $secondaryBlack;
+
+      &.next {
+        transform: rotate(180deg);
+        cursor: pointer;
+      }
+
+      @media(hover: hover) {
+        &:hover {
+          background: $primaryColor;
+        }
+      }
+    }
+
+    .swiper {
+      //TODO Swiper
+      min-width: 71vw;
+
+      .swiper-slide {
+        a {
+          width: 100%;
+          height: 26rem;
+          display: block;
+          position: relative;
+
+          img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    padding-top: 3.5rem;
+    position: relative;
+    .text-container {
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2.625rem;
+      padding-top: 6rem;
+
+      .handwritten {
+        position: absolute;
+        font-size: 2.525rem;
+        left: 1rem;
+        top: -3rem;
+      }
+
+      .heading-container {
+        .heading {
+          font-size: 2rem;
+          display: inline;
+          &:last-child {
+            margin-left: 0;
+          }
+        }
+      }
+
+      a{
+        display: none;
+      }
+    }
+
+    .swiper-gallery-container {
+      .swiper-arrows {
+        justify-content: flex-end;
+        margin-bottom: 3rem;
+      }
+
+      .swiper {
+        .swiper-slide {
+          a {
+            height: 20rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// INSTAGRAM SECTION ---- END
+
+
+// MAP SECTION ---- START
+
+#mapSection {
+  margin: 8rem 0;
+
+  .map-container {
+    iframe {
+      filter: grayscale(100%) contrast(100%);
+      width: 100%;
+      height: 24rem;
+    }
+  }
+
+  .info {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding-left: 2rem;
+
+    .heading-container {
+      .heading {
+        margin-top: 0;
+        font-size: 3rem;
+
+        &:last-child {
+          margin-top: 0.5rem;
+          margin-left: 2rem;
+        }
+      }
+    }
+
+    .address-container {
+      display: flex;
+      margin-top: 5rem;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+
+      p {
+        white-space: pre-line;
+        font-size: 1.5rem;
+        line-height: 1.8125rem;
+      }
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    margin: 6rem 0 0 0;
+
+    .map-container{
+      iframe{
+        width: 100vw;
+        transform: translateX(-1rem);
+      }
+    }
+
+    .info {
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding-left: 0.5rem;
+
+
+      .heading-container {
+        .heading {
+          font-size: 2rem;
+          margin: 0 !important;
+          display: block;
+        }
+      }
+
+      .address-container {
+        display: block;
+        margin-top: 2rem;
+        .text{
+          margin-bottom: 2rem;
+        }
+        a{
+          width: fit-content;
+          margin-bottom: 3rem;
+        }
+      }
+    }
+  }
+}
+
+// MAP SECTION ---- END

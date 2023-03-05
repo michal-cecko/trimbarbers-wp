@@ -1,0 +1,27 @@
+#reservation {
+  position: fixed;
+  right: 0;
+  bottom: 8vh;
+  width: 100vw;
+  z-index: 8;
+  height: auto;
+
+  #openReservationBtn {
+    margin-left: auto;
+    display: none;
+  }
+
+  .reservation-container {
+    .header {
+      .close{
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background: $quadraWhite;
+      }
+    }
+  }
+}

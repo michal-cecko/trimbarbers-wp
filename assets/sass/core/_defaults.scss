@@ -1,0 +1,119 @@
+html {
+    font-size: 16px;
+    font-family: $primaryFont;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+a {
+    text-decoration: none;
+}
+
+ul,
+ol{
+    list-style-type: none;
+}
+
+body {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    min-height: 300vh;
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    line-height: 1.25;
+    color: $primaryBlack;
+    font-family: $primaryFont;
+}
+button,
+input,
+select,
+textarea {
+    font-size: 100%;
+    font-family: inherit;
+    line-height: 1.15;
+    margin: 0;
+    outline: none;
+    &:focus {
+        outline: none;
+    }
+}
+$mainColor: black;
+*::-webkit-input-placeholder {
+    color: $mainColor;
+}
+*:-moz-placeholder {
+    color: $mainColor;
+    opacity: 1;
+}
+*::-moz-placeholder {
+    color: $mainColor;
+    opacity: 1;
+}
+*:-ms-input-placeholder {
+    color: $mainColor;
+}
+*::-ms-input-placeholder {
+    color: $mainColor;
+}
+* {
+    &::placeholder {
+        color: $mainColor;
+    }
+}
+
+
+a{
+    text-decoration: none !important;
+}
+
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    outline: none;
+    &:focus,
+    &:visited,
+    &:active{
+        outline: none;
+    }
+}
+
+section{
+    position: relative;
+    width: 100%;
+}
+
+//custom scrollbar
+
+/* Works on Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #a8a8a8 #535353;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #eee;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #bbb;
+    border-radius: 20px;
+    border: 3px solid #bbb;
+}
