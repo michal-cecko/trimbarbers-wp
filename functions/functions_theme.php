@@ -130,7 +130,7 @@ const COMPONENT_PREFIX = "comp-";
 function enqueue_component($name, $defaultPHPVars = [], ...$moreVals)
 {
     $handle = COMPONENT_PREFIX . $name;
-    wp_register_script($handle, get_template_directory_uri() . "/dist/js/components/" . $name . ".js", ("vue"), VERSION, true);
+    wp_register_script($handle, get_template_directory_uri() . "/dist/js/components/" . $name . ".js", false, VERSION, true);
     wp_enqueue_script($handle);
 
     $vars = array_merge($moreVals, $defaultPHPVars);
@@ -146,7 +146,7 @@ function add_type_attribute($tag, $handle, $src)
         return $tag;
     }
 
-    // change the script tag by adding type="module" and return it.
+    // load component as module.
     return '<script type="module" src="' . esc_url($src) . '"></script>';
 }
 
@@ -181,12 +181,9 @@ function enqueue_custom_scripts_links(): void
 
     //COMPONENTS
 
-    enqueue_component("ajax", $defaultPHPVars);
+    enqueue_component("commons", $defaultPHPVars);
     enqueue_component("header");
-
-    if (is_front_page()) {
-        enqueue_component("reservation");
-    }
+    enqueue_component("reservation");
 
 
     //STYLES
@@ -212,8 +209,13 @@ function admin_enqueue_scripts()
         'nonce' => wp_create_nonce('ajax-nonce')
     ];
 
-    wp_register_style('admin-css', get_template_directory_uri() . '/dist/css/admin.css', FALSE, time());
-    wp_enqueue_style('admin-css');
+    wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css', FALSE, time());
+    wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js');
+    wp_enqueue_script('vue-js', 'https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js');
+    wp_enqueue_style('admin-css', get_template_directory_uri() . '/dist/css/admin/admin.css', FALSE, time());
+    wp_enqueue_style('calendar-css', get_template_directory_uri() . '/dist/css/admin/calendar.css', FALSE, time());
+    wp_enqueue_script('lordicon-js', 'https://cdn.lordicon.com/libs/mssddfmo/lord-icon-2.1.0.js');
+
 
     wp_register_script(
         "admin-js",
@@ -224,6 +226,12 @@ function admin_enqueue_scripts()
     );
     wp_enqueue_script('admin-js');
     wp_localize_script('admin-js', 'PHPVars', $defaultPHPVars);
+
+    //COMPONENTS
+    enqueue_component("ajax", $defaultPHPVars);
+
+    //CALENDAR WITH SK LOCALE
+    enqueue_component("admin/calendar");
 }
 
-add_action('admin_enqueue_scripts', 'admin_enqueue_scripts');
+add_action('admin_enqueue_scripts', 'admin_enqueue_scripts', 10);

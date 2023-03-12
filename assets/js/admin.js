@@ -1,11 +1,13 @@
-import Ajax from "./components/ajax";
-
-class Admin extends Ajax{
+class Admin{
     constructor() {
-        super()
-
         this.ajaxURL = PHPVars.ajaxUrl
         this.nonce = PHPVars.nonce
+
+        this.prepareCalendar()
+    }
+
+    prepareCalendar() {
+
     }
 }
 

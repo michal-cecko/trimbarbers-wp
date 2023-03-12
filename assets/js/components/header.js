@@ -1,6 +1,6 @@
-import Ajax from "./ajax.js"
+import Commons from "./commons.js"
 
-class Header extends Ajax {
+class Header extends Commons {
 
     constructor() {
         super();

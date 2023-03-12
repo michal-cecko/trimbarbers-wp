@@ -101,3 +101,9 @@ function script_path($uri = true) {
 function favicon_path($uri = true) {
     return ($uri ? get_template_directory_uri() : get_template_directory()) . "/assets/favicon";
 }
+
+
+
+function js_json_decode($json) {
+    return json_decode(str_replace("\\", "", $json), true);
+}

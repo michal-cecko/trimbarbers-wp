@@ -40,4 +40,12 @@ $barbers = get_users([
             </div>
         </div>
     </div>
+    <div id="current-reservation">
+        <div class="header">
+            <span>Vaša rezervácia</span>
+        </div>
+        <span class="toggle-button">
+            <?= svgIcon(icon_path(false) . "/icon-close.svg") ?>
+        </span>
+    </div>
 </div>

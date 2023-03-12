@@ -36,14 +36,14 @@ gulp.task('sass', function () {
 });
 
 gulp.task('admin-sass', function () {
-    return gulp.src('assets/sass/admin/admin.scss')
+    return gulp.src('assets/sass/admin/**/*.scss')
         .pipe(sass({outputStyle: 'compressed'}))
         .pipe(sourcemaps.init())
         .pipe(autoprefixer())
         .pipe(cleanCSS())
         .pipe(sourcemaps.write())
         .pipe(sass().on('error', sass.logError))
-        .pipe(gulp.dest('dist/css/'))
+        .pipe(gulp.dest('dist/css/admin'))
 });
 
 gulp.task('assets:watch', function () {

@@ -1,0 +1,20 @@
+/* Import Google font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+$todayColor: #5b6ebb;
+$activeColor: #b1bb5b;
+
+#calendar {
+  width: 100%;
+  max-width: 900px;
+  padding: 20px;
+
+  .delete-button{
+    position: absolute;
+    right: 0.5rem;
+    top: 0;
+    z-index: 5;
+    color: white;
+    font-size: 1rem;
+  }
+}

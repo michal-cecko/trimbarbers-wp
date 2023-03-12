@@ -1,6 +1,6 @@
-import Ajax from "./ajax.js"
+import Commons from "./commons.js"
 
-class Reservation extends Ajax {
+class Reservation extends Commons {
 
     constructor() {
         super();
