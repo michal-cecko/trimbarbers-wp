@@ -107,3 +107,12 @@ function favicon_path($uri = true) {
 function js_json_decode($json) {
     return json_decode(str_replace("\\", "", $json), true);
 }
+
+
+function getStartAndEndDateOfWeek($timestamp) {
+  $currentDayOfWeek = date('N', $timestamp); // Get current day of the week (1 = Monday, 7 = Sunday)
+  $weekStartDate = date('Y-m-d', strtotime("-".($currentDayOfWeek-1)." days", $timestamp)); // Calculate the start date of the current week
+  $weekEndDate = date('Y-m-d', strtotime("+".(7-$currentDayOfWeek)." days", $timestamp)); // Calculate the end date of the current week
+
+  return ["start" => $weekStartDate, "end" => $weekEndDate];
+}

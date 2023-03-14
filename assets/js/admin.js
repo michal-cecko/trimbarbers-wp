@@ -11,6 +11,6 @@ class Admin{
     }
 }
 
-new Admin
+new Admin()
 
 export {};

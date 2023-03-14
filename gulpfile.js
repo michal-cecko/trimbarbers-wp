@@ -18,9 +18,8 @@ gulp.task('minify', function () {
         .pipe(gulp.dest('dist/css/'))
 });
 
-gulp.task('scripts', function() {
+gulp.task('scripts', function () {
     return gulp.src(['assets/js/**/*.js', '!assets/js/**/*.min.js'])
-        .pipe(uglify())
         .pipe(gulp.dest('dist/js/'))
 });
 

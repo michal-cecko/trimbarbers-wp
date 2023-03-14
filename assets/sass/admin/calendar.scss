@@ -6,15 +6,272 @@ $activeColor: #b1bb5b;
 
 #calendar {
   width: 100%;
-  max-width: 900px;
-  padding: 20px;
+  height: 90vh;
 
-  .delete-button{
+  .delete-button {
     position: absolute;
-    right: 0.5rem;
-    top: 0;
+    right: 0;
+    bottom: 100%;
+    background: red;
+    padding: 0.25rem;
+    line-height: 0.6;
+    border-radius: 3px;
     z-index: 5;
     color: white;
     font-size: 1rem;
+  }
+
+  .fc-event {
+    .event-content-container {
+      .title {
+        font-weight: bold;
+      }
+
+      .note {
+        opacity: 0.7;
+      }
+
+      &.timeGridWeek {
+        .time {
+          font-size: 0.6rem;
+        }
+
+        .title {
+          font-size: 0.68rem;
+        }
+
+        .service {
+          font-size: 0.6rem;
+        }
+
+        .note {
+          font-size: 0.6rem;
+        }
+      }
+
+      &.timeGridDay {
+        padding: 0.5rem;
+
+        .time {
+          display: block;
+          font-size: 1rem;
+          margin-right: 1rem;
+        }
+
+        .title {
+          display: inline-block;
+          font-size: 1rem;
+          margin-right: 1rem;
+        }
+
+        .service {
+          display: inline-block;
+          font-size: 0.9rem;
+        }
+
+        .heading {
+          margin-top: 0.7rem;
+          color: #fff;
+          opacity: 0.7;
+          font-size: 0.6rem;
+          text-transform: uppercase;
+        }
+
+        .email,
+        .phone {
+          display: inline-block;
+          margin-right: 0.5rem;
+          font-weight: 600;
+          font-size: 0.7rem;
+        }
+
+        .note {
+          font-size: 0.8rem;
+          margin-top: 0.7rem;
+        }
+      }
+    }
+  }
+
+  .fc-col-header-cell-cushion {
+      text-decoration: none !important;
+  }
+
+  .fc-event-main {
+    padding: 0;
+  }
+
+  .fc-timegrid-slot-label-cushion {
+    text-align: left;
+    display: block;
+    width: 100%;
+  }
+
+  .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media screen and (max-width: 782px) {
+    height: 85vh;
+    .fc-view-harness {
+      overflow-x: auto;
+
+      .fc-view {
+        &.fc-timeGridWeek-view {
+          min-width: 700px;
+        }
+      }
+    }
+    .fc-col-header-cell {
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    .fc-toolbar-title {
+      font-size: 1.5rem;
+    }
+    .fc-timegrid-slot-label-cushion {
+      font-size: 0.8rem;
+    }
+    .fc-timegrid-axis-cushion {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+#calendarContainer {
+  padding: 1.25rem;
+  .barbers-toggler{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2rem;
+    .barber{
+      padding: 0.6rem 1.5rem;
+      background: white;
+      border: 1px solid #ddd;
+      display: flex;
+      cursor: pointer;
+      align-items: center;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      .img{
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        img,
+        svg{
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      span{
+        font-weight: bold;
+        font-size: 1rem;
+        margin-left: 1rem;
+      }
+      &.active{
+        background: #ddd;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        .img{
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          img,
+          svg{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+        span{
+          font-weight: bold;
+          font-size: 1rem;
+          margin-left: 1rem;
+        }
+      }
+    }
+  }
+  .modal-dialog {
+    max-width: 800px !important;
+    margin-top: 4rem;
+
+    .modal-content {
+      p {
+        font-size: 1rem;
+        color: #484848;
+      }
+
+      .divided-row {
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 1rem;
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: 0;
+        }
+      }
+
+      .heading-part {
+        h3 {
+          font-size: 1.1rem;
+        }
+      }
+
+      .field-container {
+        label {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #414141;
+          margin-bottom: 0.3rem;
+        }
+
+        select {
+          width: 100%;
+          max-width: unset;
+        }
+      }
+    }
+  }
+}
+
+#deleteAppointmentModal {
+  .appointmentToDelete {
+    display: flex;
+    flex-wrap: wrap;
+
+    & > div {
+      display: flex;
+      align-items: center;
+      margin-right: 1rem;
+      font-weight: bold;
+
+      &::before {
+        content: "";
+        display: block;
+        width: 0.4rem;
+        height: 0.4rem;
+        background: #ddd;
+        border-radius: 50%;
+        margin-right: 1rem;
+      }
+
+      &:first-child {
+        &::before {
+          display: none;
+        }
+      }
+    }
   }
 }

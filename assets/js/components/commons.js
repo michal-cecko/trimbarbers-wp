@@ -5,16 +5,35 @@ export default class Commons {
         this.phoneMQ = window.matchMedia('(max-width: 768px)');
     }
 
-    getTodaysDate() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+    getDateFromTimestamp(timestamp, addTime = false) {
+        const date = moment(timestamp);
+        return date.format('YYYY-MM-DD');
+    }
+
+    getCurrentTimestamp() {
+        const utcOffset = 60; // UTC+1
+        const now = moment.utc().utcOffset(utcOffset);
+        return now.valueOf();
     }
 
     leadZero(number) {
         if(number < 10) return "0" + number;
         return number
+    }
+
+    addParamsToUrl(params, baseUrl) {
+        const queryString = Object.entries(params)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+            .join('&');
+
+        return `${baseUrl}?${queryString}`;
+    }
+
+    async WPPostAjax(body) {
+        return fetch(this.ajaxURL, {
+            method: 'POST',
+            credentials: 'same-origin',
+            body: body,
+        });
     }
 }
