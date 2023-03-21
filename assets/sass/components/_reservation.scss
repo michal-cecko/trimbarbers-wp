@@ -8,19 +8,1124 @@
 
   #openReservationBtn {
     margin-left: auto;
-    display: none;
+    transform: translateX(3rem);
+    transition: all 0.5s ease;
+    opacity: 0;
+    pointer-events: none;
+    &.active{
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
   }
 
   .reservation-container {
+    position: absolute;
+    right: 5rem;
+    bottom: 0;
+    box-shadow: 0 0.3125rem 1rem rgba(0, 0, 0, 0.1);
+    width: 22rem;
+    background: $primaryWhite;
+    padding: 1.7rem 1.7rem 3rem 1.7rem;
+    border-radius: 0.9375rem;
+    overflow: hidden;
+    transform: translateX(3rem);
+    transition: all 0.5s ease;
+    opacity: 0;
+    pointer-events: none;
+    &.active{
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
+
+    & > .header {
+      display: flex;
+      margin-bottom: 1.5rem;
+      justify-content: space-between;
+      align-items: center;
+
+      .close {
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        cursor: pointer;
+        background: $quadraWhite;
+
+        svg {
+          width: 1.2rem;
+          height: auto;
+        }
+      }
+
+      .header-text {
+        padding-left: 0;
+        transition: all 0.3s ease;
+        position: relative;
+
+        .back-button {
+          width: 2rem;
+          height: 2rem;
+          cursor: pointer;
+          border-radius: 50%;
+          background: $quadraWhite;
+          transition: all 0.3s ease;
+          transform: translateX(-1rem) translateY(-50%);
+          opacity: 0;
+          position: absolute;
+          left: 0;
+          top: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          svg {
+            width: 0.5rem;
+            transition: all 0.3s ease;
+            height: auto;
+
+            path {
+              fill: $tertiaryBlack;
+            }
+          }
+        }
+
+        .texts {
+          span {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.25rem;
+          }
+        }
+      }
+
+      &.hasBackButton {
+        .header-text {
+          padding-left: 3rem;
+
+          .back-button {
+            transform: translateX(0) translateY(-50%);
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+
+    .reservation-wrapper {
+      position: relative;
+    }
+
+    .content-container {
+      display: flex;
+      flex-wrap: nowrap;
+      position: absolute;
+      left: 1.7rem;
+      top: 5rem;
+      gap: 1.7rem;
+      transition: all 0.4s ease;
+      height: auto;
+    }
+
+    .content {
+      width: 18.6rem;
+      height: fit-content;
+
+      & > * {
+        grid-row: auto;
+      }
+
+      &.choose-barber {
+        display: grid;
+        grid-template-columns: repeat(2, 50%);
+
+        .barber {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 1.2rem;
+          border: 1px solid $borderWhite;
+          border-radius: 0.625rem;
+          width: calc(100% - 0.5rem);
+          margin-bottom: 1rem;
+          height: 10rem;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          color: $primaryBlack;
+
+          &:nth-child(odd) {
+            margin-right: 0.5rem;
+          }
+
+          &:nth-child(even) {
+            margin-left: 0.5rem;
+          }
+
+          &:nth-last-child(-n+2) {
+            margin-bottom: 0;
+          }
+
+          .img-container {
+            background: $quadraWhite;
+            width: 3.25rem;
+            height: 3.25rem;
+            border-radius: 0.625rem;
+            margin-bottom: 1rem;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+
+            svg {
+              width: auto;
+              height: 1.125rem;
+            }
+
+            &.any {
+              svg {
+                width: auto;
+                height: 1.5rem;
+              }
+            }
+          }
+
+          .name {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.25rem;
+            letter-spacing: 0.02em;
+            text-align: center;
+            transition: all 0.3s ease;
+          }
+
+          &.chosen {
+            background: $primaryColor;
+
+            .name {
+              color: $primaryWhite;
+            }
+          }
+        }
+      }
+
+      &.choose-service {
+        display: grid;
+        grid-template-columns: repeat(2, 50%);
+
+        .service {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 1.2rem;
+          border: 1px solid $borderWhite;
+          border-radius: 0.625rem;
+          width: calc(100% - 0.5rem);
+          margin-bottom: 1rem;
+          height: 7rem;
+          transition: all 0.3s ease;
+          color: $primaryBlack;
+          cursor: pointer;
+          position: relative;
+
+          &:nth-child(odd) {
+            margin-right: 0.5rem;
+          }
+
+          &:nth-child(even) {
+            margin-left: 0.5rem;
+          }
+
+          &:nth-last-child(-n+2) {
+            margin-bottom: 0;
+          }
+
+          .name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.0625rem;
+            letter-spacing: 0.02em;
+            margin-bottom: 0.3125rem;
+          }
+
+          .duration {
+            font-size: 0.75rem;
+            font-weight: 400;
+            line-height: 0.9375rem;
+            color: $tertiaryBlack;
+          }
+
+          .price {
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.0625rem;
+            position: absolute;
+            right: 1.2rem;
+            bottom: 1.2rem;
+          }
+
+          &.chosen {
+            background: $primaryColor;
+
+            .name,
+            .price,
+            .duration {
+              color: $primaryWhite;
+            }
+          }
+        }
+      }
+
+      &.choose-date {
+        height: 100%;
+        transition: all 0.3s ease;
+        min-height: 15rem;
+
+        .empty-date-picker {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+          width: 100%;
+          transition: all 0.3s ease;
+          opacity: 0;
+          pointer-events: none;
+          position: absolute;
+          left: 0;
+          top: 0;
+
+          &.shown {
+            opacity: 1;
+          }
+
+          lord-icon {
+            width: 4rem;
+            height: auto;
+          }
+        }
+
+        .date-picker {
+          opacity: 0;
+          pointer-events: none;
+
+          &.shown {
+            opacity: 1;
+            pointer-events: all;
+          }
+        }
+
+        .date-grid{
+          display: grid;
+          grid-template-columns: repeat(7, auto);
+          grid-row-gap: 0.5rem;
+          margin-bottom: 1rem;
+        }
+
+        .month-name {
+          width: 100%;
+          color: $primaryBlack;
+          font-size: 1rem;
+          font-weight: 600;
+          line-height: 0.9375rem;
+          margin-bottom: 0.85rem;
+        }
+
+        .date {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          cursor: pointer;
+
+          .number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 2rem;
+            border-radius: 50%;
+            height: 2rem;
+            background: $quadraWhite;
+            color: $tertiaryBlack;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+          }
+
+          .name {
+            font-weight: 600;
+            margin-top: 0.375rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.07em;
+            text-align: center;
+            color: $quadraBlack;
+            transition: all 0.3s ease;
+          }
+
+          &.chosen {
+            .number {
+              background: $primaryColor;
+              color: $primaryWhite;
+            }
+
+            .name {
+              color: $primaryBlack;
+            }
+          }
+        }
+      }
+
+      &.choose-time {
+        .time-picker {
+          display: grid;
+          grid-template-columns: repeat(3, 33.333%);
+          width: calc(100% - 2rem);
+          grid-column-gap: 1rem;
+          grid-row-gap: 0.5rem;
+
+          .time-container {
+            transition: all 0.3s ease;
+            border: 1px solid $borderWhite;
+            background: rgba($primaryColor, 0);
+            display: flex;
+            cursor: pointer;
+            align-items: center;
+            padding: 0.375rem 0.375rem 0.375rem 0.875rem;
+
+            .time {
+              font-size: 0.8rem;
+              font-weight: 600;
+              line-height: 0.95rem;
+              color: $tertiaryBlack;
+              transition: all 0.3s ease;
+            }
+
+            &.chosen {
+              background: rgba($primaryColor, 1);
+              border: 1px solid $primaryColor;
+
+              .time {
+                color: $primaryWhite;
+              }
+            }
+          }
+        }
+      }
+
+      &.choose-contact {
+        .form-input {
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+
+  #current-reservation {
+    position: absolute;
+    bottom: 0;
+    background: $primaryWhite;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 3.5rem;
+    transition: all 0.4s ease, max-height 0.5s ease;
+    box-shadow: 0 0.3125rem 1.875rem rgba(0, 0, 0, 0.15);
+    border-radius: 0.625rem 0.625rem 0 0;
+    z-index: 5;
     .header {
-      .close{
-        width: 1.5rem;
-        height: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.7rem;
+      border-radius: 0.9375rem;
+      cursor: pointer;
+
+      .toggle-button {
+        width: 2rem;
+        height: 2rem;
         display: flex;
         justify-content: center;
         align-items: center;
         border-radius: 50%;
         background: $quadraWhite;
+
+        svg {
+          transform: rotate(90deg);
+          width: 0.5rem;
+          transition: all 0.3s ease;
+          height: auto;
+
+          path {
+            fill: $tertiaryBlack;
+          }
+        }
+      }
+
+      .header-text {
+        font-size: 0.875rem;
+        font-weight: 600;
+        line-height: 1.0625rem;
+      }
+    }
+
+    .order {
+      display: grid;
+      width: 100%;
+      grid-template-columns: 4rem 1fr;
+      padding: 0.8rem 1.7rem;
+
+      .img-container {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.3125rem;
+        position: relative;
+        display: flex;
+        overflow: hidden;
+        justify-content: center;
+        align-items: center;
+        background: $quadraWhite;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        svg {
+          width: auto;
+          height: 1.2rem;
+        }
+      }
+
+      .info {
+        width: 100%;
+
+        .name-price-container {
+          display: flex;
+          justify-content: space-between;
+
+          .name,
+          .price {
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.0625rem;
+            margin-bottom: 0.4375rem;
+          }
+        }
+
+        .service,
+        .date {
+          font-size: 0.85rem;
+          color: $tertiaryBlack;
+          font-weight: 500;
+          line-height: 0.9375rem;
+        }
+
+        .date {
+          margin-top: 0.2rem;
+        }
+      }
+    }
+
+    .contact-data{
+      display: grid;
+      grid-template-columns: auto auto;
+      grid-gap: 0.625rem;
+      width: calc(100% - 0.625rem - 3.4rem);
+      margin-inline: 1.7rem;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid $borderWhite;
+      .label{
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: $quadraBlack;
+      }
+      .value{
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $primaryBlack;
+      }
+    }
+
+    .button-container {
+      padding: 0.8rem 1.7rem;
+
+      button {
+        width: 100%;
+        padding: 0.5rem 1.7rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    &.visible {
+      max-height: 13rem;
+      &.bigger{
+        max-height: 24rem;
+      }
+
+      .header {
+        .toggle-button {
+          svg {
+            transform: rotate(-90deg);
+          }
+        }
+      }
+    }
+  }
+
+  .sending-overlay{
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    z-index: 6;
+    background: rgba($primaryWhite, 0.9);
+    transition: all 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    lord-icon{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+    }
+    .loader,
+    .check{
+      transform: translate(-50%, -50%) scale(0);
+      transition: all 0.4s ease;
+      width: 4rem;
+      height: 4rem;
+    }
+    &.sending{
+      opacity: 1;
+      pointer-events: all;
+      .loader{
+        transform: translate(-50%, -50%) scale(1);
+      }
+      &.sent{
+        .loader{
+          transform: translate(-50%, -50%) scale(0);
+        }
+        .check{
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+    }
+   }
+
+
+
+
+
+
+
+
+
+  @include media-breakpoint-down(sm) {
+    bottom: 4vh;
+
+    .reservation-container {
+      right: 1rem;
+      width: calc(100vw - 2.5rem);
+      padding: 1.7rem 1.7rem 3rem 1.7rem;
+
+      .content {
+        width: calc(100vw - 2.5rem - 3.4rem);
+
+        &.choose-barber {
+          display: grid;
+          grid-template-columns: repeat(2, 50%);
+
+          .barber {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.2rem;
+            border: 1px solid $borderWhite;
+            border-radius: 0.625rem;
+            width: calc(100% - 0.5rem);
+            margin-bottom: 1rem;
+            height: 10rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: $primaryBlack;
+
+            &:nth-child(odd) {
+              margin-right: 0.5rem;
+            }
+
+            &:nth-child(even) {
+              margin-left: 0.5rem;
+            }
+
+            &:nth-last-child(-n+2) {
+              margin-bottom: 0;
+            }
+
+            .img-container {
+              background: $quadraWhite;
+              width: 3.25rem;
+              height: 3.25rem;
+              border-radius: 0.625rem;
+              margin-bottom: 1rem;
+              position: relative;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              overflow-x: hidden;
+
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+
+              svg {
+                width: auto;
+                height: 1.125rem;
+              }
+
+              &.any {
+                svg {
+                  width: auto;
+                  height: 1.5rem;
+                }
+              }
+            }
+
+            .name {
+              font-size: 1rem;
+              font-weight: 600;
+              line-height: 1.25rem;
+              letter-spacing: 0.02em;
+              text-align: center;
+              transition: all 0.3s ease;
+            }
+
+            &.chosen {
+              background: $primaryColor;
+
+              .name {
+                color: $primaryWhite;
+              }
+            }
+          }
+        }
+
+        &.choose-service {
+          display: grid;
+          grid-template-columns: repeat(2, 50%);
+
+          .service {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1.2rem;
+            border: 1px solid $borderWhite;
+            border-radius: 0.625rem;
+            width: calc(100% - 0.5rem);
+            margin-bottom: 1rem;
+            height: 7rem;
+            transition: all 0.3s ease;
+            color: $primaryBlack;
+            cursor: pointer;
+            position: relative;
+
+            &:nth-child(odd) {
+              margin-right: 0.5rem;
+            }
+
+            &:nth-child(even) {
+              margin-left: 0.5rem;
+            }
+
+            &:nth-last-child(-n+2) {
+              margin-bottom: 0;
+            }
+
+            .name {
+              font-size: 0.875rem;
+              font-weight: 600;
+              line-height: 1.0625rem;
+              letter-spacing: 0.02em;
+              margin-bottom: 0.3125rem;
+            }
+
+            .duration {
+              font-size: 0.75rem;
+              font-weight: 400;
+              line-height: 0.9375rem;
+              color: $tertiaryBlack;
+            }
+
+            .price {
+              font-size: 0.875rem;
+              font-weight: 700;
+              line-height: 1.0625rem;
+              position: absolute;
+              right: 1.2rem;
+              bottom: 1.2rem;
+            }
+
+            &.chosen {
+              background: $primaryColor;
+
+              .name,
+              .price,
+              .duration {
+                color: $primaryWhite;
+              }
+            }
+          }
+        }
+
+        &.choose-date {
+          height: 100%;
+          transition: all 0.3s ease;
+          min-height: 15rem;
+
+          .empty-date-picker {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            left: 0;
+            top: 0;
+
+            &.shown {
+              opacity: 1;
+            }
+
+            lord-icon {
+              width: 4rem;
+              height: auto;
+            }
+          }
+
+          .date-picker {
+            opacity: 0;
+            pointer-events: none;
+
+            &.shown {
+              opacity: 1;
+              pointer-events: all;
+            }
+          }
+
+          .date-grid{
+            display: grid;
+            grid-template-columns: repeat(7, auto);
+            grid-row-gap: 0.5rem;
+            margin-bottom: 1rem;
+          }
+
+          .month-name {
+            width: 100%;
+            color: $primaryBlack;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 0.9375rem;
+            margin-bottom: 0.85rem;
+          }
+
+          .date {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+
+            .number {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 2rem;
+              border-radius: 50%;
+              height: 2rem;
+              background: $quadraWhite;
+              color: $tertiaryBlack;
+              transition: all 0.3s ease;
+              font-size: 0.9rem;
+              font-weight: 600;
+              letter-spacing: 0.07em;
+            }
+
+            .name {
+              font-weight: 600;
+              margin-top: 0.375rem;
+              font-size: 0.7rem;
+              letter-spacing: 0.07em;
+              text-align: center;
+              color: $quadraBlack;
+              transition: all 0.3s ease;
+            }
+
+            &.chosen {
+              .number {
+                background: $primaryColor;
+                color: $primaryWhite;
+              }
+
+              .name {
+                color: $primaryBlack;
+              }
+            }
+          }
+        }
+
+        &.choose-time {
+          .time-picker {
+            display: grid;
+            grid-template-columns: repeat(3, 33.333%);
+            width: calc(100% - 2rem);
+            grid-column-gap: 1rem;
+            grid-row-gap: 0.5rem;
+
+            .time-container {
+              transition: all 0.3s ease;
+              border: 1px solid $borderWhite;
+              background: rgba($primaryColor, 0);
+              display: flex;
+              cursor: pointer;
+              align-items: center;
+              padding: 0.375rem 0.375rem 0.375rem 0.875rem;
+
+              .time {
+                font-size: 0.8rem;
+                font-weight: 600;
+                line-height: 0.95rem;
+                color: $tertiaryBlack;
+                transition: all 0.3s ease;
+              }
+
+              &.chosen {
+                background: rgba($primaryColor, 1);
+                border: 1px solid $primaryColor;
+
+                .time {
+                  color: $primaryWhite;
+                }
+              }
+            }
+          }
+        }
+
+        &.choose-contact {
+          .form-input {
+            margin-bottom: 1rem;
+          }
+        }
+      }
+    }
+
+    #current-reservation {
+      position: absolute;
+      bottom: 0;
+      background: $primaryWhite;
+      left: 0;
+      width: 100%;
+      height: auto;
+      max-height: 3.5rem;
+      transition: all 0.4s ease, max-height 0.5s ease;
+      box-shadow: 0 0.3125rem 1.875rem rgba(0, 0, 0, 0.15);
+      border-radius: 0.625rem 0.625rem 0 0;
+      z-index: 5;
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 1.7rem;
+        border-radius: 0.9375rem;
+        cursor: pointer;
+
+        .toggle-button {
+          width: 2rem;
+          height: 2rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 50%;
+          background: $quadraWhite;
+
+          svg {
+            transform: rotate(90deg);
+            width: 0.5rem;
+            transition: all 0.3s ease;
+            height: auto;
+
+            path {
+              fill: $tertiaryBlack;
+            }
+          }
+        }
+
+        .header-text {
+          font-size: 0.875rem;
+          font-weight: 600;
+          line-height: 1.0625rem;
+        }
+      }
+
+      .order {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 4rem 1fr;
+        padding: 0.8rem 1.7rem;
+
+        .img-container {
+          width: 3rem;
+          height: 3rem;
+          border-radius: 0.3125rem;
+          position: relative;
+          display: flex;
+          overflow: hidden;
+          justify-content: center;
+          align-items: center;
+          background: $quadraWhite;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          svg {
+            width: auto;
+            height: 1.2rem;
+          }
+        }
+
+        .info {
+          width: 100%;
+
+          .name-price-container {
+            display: flex;
+            justify-content: space-between;
+
+            .name,
+            .price {
+              font-size: 0.95rem;
+              font-weight: 700;
+              line-height: 1.0625rem;
+              margin-bottom: 0.4375rem;
+            }
+          }
+
+          .service,
+          .date {
+            font-size: 0.85rem;
+            color: $tertiaryBlack;
+            font-weight: 500;
+            line-height: 0.9375rem;
+          }
+
+          .date {
+            margin-top: 0.2rem;
+          }
+        }
+      }
+
+      .contact-data{
+        display: grid;
+        grid-template-columns: auto auto;
+        grid-gap: 0.625rem;
+        width: calc(100% - 0.625rem - 3.4rem);
+        margin-inline: 1.7rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid $borderWhite;
+        .label{
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          color: $quadraBlack;
+        }
+        .value{
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: $primaryBlack;
+        }
+      }
+
+      .button-container {
+        padding: 0.8rem 1.7rem;
+
+        button {
+          width: 100%;
+          padding: 0.5rem 1.7rem;
+          font-size: 0.8rem;
+        }
+      }
+
+      &.visible {
+        max-height: 13rem;
+        &.bigger{
+          max-height: 24rem;
+        }
+
+        .header {
+          .toggle-button {
+            svg {
+              transform: rotate(-90deg);
+            }
+          }
+        }
+      }
+    }
+
+    .sending-overlay{
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      z-index: 6;
+      background: rgba($primaryWhite, 0.9);
+      transition: all 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+      lord-icon{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+      }
+      .loader,
+      .check{
+        transform: translate(-50%, -50%) scale(0);
+        transition: all 0.4s ease;
+        width: 4rem;
+        height: 4rem;
+      }
+      &.sending{
+        opacity: 1;
+        pointer-events: all;
+        .loader{
+          transform: translate(-50%, -50%) scale(1);
+        }
+        &.sent{
+          .loader{
+            transform: translate(-50%, -50%) scale(0);
+          }
+          .check{
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
       }
     }
   }

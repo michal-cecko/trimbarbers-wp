@@ -22,6 +22,10 @@ if ($services->have_posts()) :
 endif;
 
 $currentUser = wp_get_current_user();
+if(!current_user_can('barber')) {
+
+}
+
 
 $barbers = get_users([
     'role' => 'barber',
@@ -41,7 +45,7 @@ foreach ($barbers as $barber) {
     <div id="services-colors" style="display:none;"
          data-colors="<?= htmlspecialchars(json_encode($colors), ENT_QUOTES, 'UTF-8'); ?>"></div>
     <div id="logged-user" style="display:none;" data-id="<?= $currentUser->ID ?>"
-         data-name="<?= $currentUser->display_name ?>"></div>
+         data-name="<?= $currentUser->display_name ?>" data-role="<?= $currentUser->roles[0] ?>"></div>
     <div id="barbers" style="display:none;"
          data-barbers="<?= htmlspecialchars(json_encode($barbersFinal), ENT_QUOTES, 'UTF-8') ?>"></div>
     <div class="barbers-toggler">
@@ -231,7 +235,7 @@ foreach ($barbers as $barber) {
                         <label for="notify">Odoslať notifikáciu?</label>
                     </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušiť</button>
-                    <button type="button" class="btn btn-primary" @click="createAppointment()">Upraviť</button>
+                    <button type="button" class="btn btn-primary" @click="editAppointment()">Upraviť</button>
                 </div>
             </div>
         </div>

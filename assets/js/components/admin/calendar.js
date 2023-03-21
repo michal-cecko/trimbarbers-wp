@@ -31,6 +31,7 @@ class ReservationCalendar extends Commons {
 
                 createModal: null,
                 editModal: null,
+                editingAppointment: null,
 
                 deleteModal: null,
                 appointmentToDelete: null,
@@ -39,7 +40,11 @@ class ReservationCalendar extends Commons {
                 chosenBarber: null,
                 barbers: null,
 
+                dateRange: {start: null, end: null},
+
                 notify: false,
+
+                hasInit: false,
             },
             created() {
                 console.log(`Calendar Vue component has been created.`)
@@ -52,8 +57,13 @@ class ReservationCalendar extends Commons {
                 this.deleteModal = new bootstrap.Modal(document.getElementById('deleteAppointmentModal'))
 
                 this.loggedInBarber = document.getElementById('logged-user').dataset;
-                this.chosenBarber = parseInt(this.loggedInBarber.id);
-                this.barbers = JSON.parse(document.getElementById('barbers').dataset.barbers)
+                if(this.loggedInBarber.role === "administrator") {
+                    this.chosenBarber = -1;
+                } else {
+                    this.chosenBarber = parseInt(this.loggedInBarber.id);
+                }
+                let barbers = JSON.parse(document.getElementById('barbers').dataset.barbers)
+                this.barbers = Object.assign({}, barbers);
 
                 this.serviceColors = JSON.parse(document.getElementById('services-colors').dataset.colors)
                 this.initCalendar()
@@ -63,7 +73,7 @@ class ReservationCalendar extends Commons {
                     let _thisVue = this
 
                     let now = _thisClass.getCurrentTimestamp()
-                    let appointments = await this.fetchAppointments(now);
+                    let appointments = await this.fetchAppointments(now, this.chosenBarber, "week");
 
                     const calendarEl = document.getElementById('calendar')
                     let calendar = new Calendar(calendarEl, {
@@ -71,8 +81,10 @@ class ReservationCalendar extends Commons {
                         locale: skLocale,
 
                         nowIndicator: true,
-                        editable: true,
-                        selectable: true,
+                        editable: _thisVue.chosenBarber !== -1,
+                        selectable: _thisVue.chosenBarber !== -1,
+                        selectOverlap: _thisVue.chosenBarber !== -1,
+                        eventResizableFromStart: _thisVue.chosenBarber !== -1,
                         initialView: 'timeGridWeek',
 
                         headerToolbar: {
@@ -109,19 +121,14 @@ class ReservationCalendar extends Commons {
                             return `${day}, ${dayNum}${month}`;
                         },
 
-                        // Creating events
                         select: function (info) {
-                            // Show the modal
+                            if(_thisVue.chosenBarber === -1) return
+
                             _thisVue.createModal.show();
                             _thisVue.appointment.datetime.start = moment(info.start).format('YYYY-MM-DD HH:mm:ss')
                             _thisVue.appointment.datetime.end = moment(info.end).format('YYYY-MM-DD HH:mm:ss')
                         },
-                        selectOverlap: function (event) {
-                            return true //event.rendering === 'background'; // only allow selection on background events
-                        },
-                        eventResizableFromStart: function (event) {
-                            return true //event.rendering === 'background'; // only allow resizing of background events
-                        },
+
                         eventDidMount: function (info) {
                             let html = '<span class="delete-button">&times;</span>';
                             let eventEl = info.el;
@@ -130,9 +137,9 @@ class ReservationCalendar extends Commons {
                                 eventEl.insertAdjacentHTML('beforeend', html);
                                 deleteButtonEl = eventEl.querySelector('.delete-button');
                                 deleteButtonEl.addEventListener('click', function () {
+                                    if(_thisVue.chosenBarber === -1) return;
+
                                     _thisVue.resetAppointmentToDeleteVariable()
-                                    let event = info.event;
-                                    console.log(info.event)
                                     _thisVue.appointmentToDelete = info.event
                                     _thisVue.deleteModal.show();
                                 });
@@ -145,6 +152,11 @@ class ReservationCalendar extends Commons {
 
                             let html = '<div class="event-content-container ' + view + '"><div class="time">' + moment(event.start).format('HH:mm') + ' - ' + moment(event.end).format('HH:mm') + '</div>';
                             html += '<div class="title">' + event.title + '</div>';
+
+                            if(_thisVue.chosenBarber === -1) {
+                                if(_thisVue.barbers[props.barberID])
+                                html += '<div class="barber">barber: ' + _thisVue.barbers[props.barberID].name + '</div>';
+                            }
 
                             if (props.type === "free") {
 
@@ -178,27 +190,64 @@ class ReservationCalendar extends Commons {
                             if (info.jsEvent.target.classList.contains('delete-button')) {
                                 return false;
                             }
+                            if(_thisVue.chosenBarber === -1) {
+                                return false;
+                            }
+                            _thisVue.editingAppointment = info.event;
                             _thisVue.loadEditModal(info.event);
                             console.log(this.appointment);
                             _thisVue.editModal.show();
                         },
                         eventDrop: function (info) {
+                            if(_thisVue.chosenBarber === -1) return
                             let app = info.event
                             _thisVue.moveAppointment(app.extendedProps.id, moment(app.start).format('YYYY-MM-DD HH:mm:ss'), moment(app.end).format('YYYY-MM-DD HH:mm:ss'))
                         },
                         eventResize: function (info) {
+                            if(_thisVue.chosenBarber === -1) return
                             let app = info.event
                             _thisVue.moveAppointment(app.extendedProps.id, moment(app.start).format('YYYY-MM-DD HH:mm:ss'), moment(app.end).format('YYYY-MM-DD HH:mm:ss'))
                         },
-                        events: appointments
+                        events: appointments,
+
+                        viewDidMount: async function(view) {
+                            let start = calendar.view.currentStart
+                            let end = calendar.view.currentEnd
+
+                            _thisVue.dateRange.start = start
+                            _thisVue.dateRange.end = end
+
+                            let fetchStart = _thisClass.utc(moment(start).add(1, "hour"))
+                            let appointments = await _thisVue.fetchAppointments(fetchStart, _thisVue.chosenBarber, view.type)
+                            _thisVue.exchangeAppointmentsOnView(appointments)
+                        }
                     })
+                    calendar.on('datesSet', async function(info) {
+                        if(!_thisVue.hasInit) return;
+
+                        let start = calendar.view.currentStart
+                        let end = calendar.view.currentEnd
+
+                        _thisVue.dateRange.start = start
+                        _thisVue.dateRange.end = end
+
+                        let fetchStart = _thisClass.utc(moment(start).add(1, "hour"))
+                        let appointments = await _thisVue.fetchAppointments(fetchStart, _thisVue.chosenBarber, calendar.view.type)
+                        _thisVue.exchangeAppointmentsOnView(appointments)
+                    });
                     this.calendar = calendar;
                     calendar.render()
+
+                    _thisVue.dateRange.start = calendar.view.currentStart
+                    _thisVue.dateRange.end = calendar.view.currentEnd
+
+                    this.hasInit = true;
                 },
 
                 async createAppointment() {
                     let data = new FormData();
-                    let barberID = parseInt(this.loggedInBarber.id);
+                    let barberID = parseInt(this.chosenBarber);
+                    data.append("notify", this.notify)
                     data.append("barberID", barberID)
                     data.append("appointment", JSON.stringify(this.appointment))
                     data.append("action", "make_appointment")
@@ -207,6 +256,7 @@ class ReservationCalendar extends Commons {
                     try {
                         let response = await _thisClass.WPPostAjax(data);
                         let responseData = await response.json();
+                        
                         this.calendar.addEvent({
                             title: this.appointment.type === "free" ? "Voľno" : this.appointment.customer.name,
                             start: this.appointment.datetime.start,
@@ -224,7 +274,61 @@ class ReservationCalendar extends Commons {
                             color: this.getActiveColor(this.appointment.type, this.appointment.serviceID),
                             textColor: '#ffffff'
                         });
+
                         this.createModal.hide();
+                        this.notify = false;
+
+                        return true;
+                    } catch (error) {
+                        console.error(error);
+                        return false;
+                    }
+                },
+
+                async editAppointment() {
+                    if(!this.editingAppointment) return;
+
+                    let data = new FormData();
+                    let barberID = parseInt(this.chosenBarber);
+
+                    data.append("id", this.editingAppointment.extendedProps.id)
+                    data.append("notify", this.notify)
+                    data.append("barberID", this.chosenBarber)
+                    data.append("appointment", JSON.stringify(this.appointment))
+                    data.append("action", "edit_appointment")
+                    data.append("nonce", _thisClass.nonce)
+
+                    console.log(this.appointment.datetime.start)
+
+                    try {
+                        let response = await _thisClass.WPPostAjax(data);
+                        console.log(response)
+                        let responseData = await response.json();
+
+                        this.editingAppointment.remove();
+                        this.editingAppointment = null;
+
+                        this.calendar.addEvent({
+                            title: this.appointment.type === "free" ? "Voľno" : this.appointment.customer.name,
+                            start: this.appointment.datetime.start,
+                            end: this.appointment.datetime.end,
+                            extendedProps: {
+                                id: responseData.id,
+                                type: this.appointment.type,
+                                note: this.appointment.note,
+                                service: responseData.service,
+                                serviceID: this.appointment.serviceID,
+                                barber: this.loggedInBarber.name,
+                                barberID: barberID,
+                                customer: this.appointment.customer,
+                            },
+                            color: this.getActiveColor(this.appointment.type, this.appointment.serviceID),
+                            textColor: '#ffffff'
+                        });
+
+                        this.editModal.hide();
+                        this.notify = false;
+
                         return true;
                     } catch (error) {
                         console.error(error);
@@ -235,6 +339,7 @@ class ReservationCalendar extends Commons {
                 async removeAppointment() {
                     let data = new FormData();
                     data.append("id", this.appointmentToDelete.extendedProps.id)
+                    data.append("notify", this.notify)
                     data.append("action", "remove_appointment")
                     data.append("nonce", _thisClass.nonce)
                     try {
@@ -242,6 +347,7 @@ class ReservationCalendar extends Commons {
                         response = await response.json();
                         this.appointmentToDelete.remove()
                         this.deleteModal.hide();
+                        this.notify = false;
                         console.log(response)
                     } catch (error) {
                         console.error(error);
@@ -267,7 +373,7 @@ class ReservationCalendar extends Commons {
                     }
                 },
 
-                async fetchAppointments(timestamp, dateRange = "week", barberID = 2) {
+                fetchAppointments(timestamp, barberID, dateRange = "timeGridWeek") {
                     let params = {
                         barberID: barberID,
                         timestamp: timestamp,
@@ -275,45 +381,71 @@ class ReservationCalendar extends Commons {
                         action: "get_appointments",
                         nonce: _thisClass.nonce,
                     };
-                    try {
-                        let response = await fetch(_thisClass.addParamsToUrl(params, _thisClass.ajaxURL));
-                        response = await response.json();
+                    console.log(params)
+                    return fetch(_thisClass.addParamsToUrl(params, _thisClass.ajaxURL))
+                        .then(response => response.json())
+                        .then(response => {
+                            let appointments = [];
+                            for (const [ID, appointment] of Object.entries(response.appointments)) {
+                                let title = "Voľno"
+                                if (appointment.type !== "free") title = appointment.customer.name
 
-                        let appointments = [];
-                        for (const [ID, appointment] of Object.entries(response.appointments)) {
-                            let title = "Voľno"
-                            if (appointment.type !== "free") title = appointment.customer.name
+                                appointments.push({
+                                    title: title,
+                                    start: moment(appointment.datetime.from, "YYYY-MM-DD HH:mm:ss").format("YYYY-MM-DDTHH:mm:ss"),
+                                    end: moment(appointment.datetime.to, "YYYY-MM-DD HH:mm:ss").format("YYYY-MM-DDTHH:mm:ss"),
+                                    extendedProps: {
+                                        id: ID,
+                                        type: appointment.type,
+                                        note: appointment.note,
+                                        service: appointment.service,
+                                        serviceID: appointment.serviceID,
+                                        barber: appointment.barber,
+                                        barberID: appointment.barberID,
+                                        customer: appointment.customer,
+                                    },
+                                    color: this.getActiveColor(appointment.type, appointment.serviceID),
+                                    textColor: '#ffffff'
+                                })
+                            }
 
-                            appointments.push({
-                                title: title,
-                                start: moment(appointment.datetime.from, "YYYY-MM-DD HH:mm:ss").format("YYYY-MM-DDTHH:mm:ss"),
-                                end: moment(appointment.datetime.to, "YYYY-MM-DD HH:mm:ss").format("YYYY-MM-DDTHH:mm:ss"),
-                                extendedProps: {
-                                    id: ID,
-                                    type: appointment.type,
-                                    note: appointment.note,
-                                    service: appointment.service,
-                                    serviceID: appointment.serviceID,
-                                    barber: appointment.barber,
-                                    barberID: appointment.barberID,
-                                    customer: appointment.customer,
-                                },
-                                color: this.getActiveColor(appointment.type, appointment.serviceID),
-                                textColor: '#ffffff'
-                            })
-                        }
+                            console.log(appointments)
 
-                        console.log(appointments)
-
-                        return appointments
-                    } catch (error) {
-                        console.error(error);
-                        return null;
-                    }
+                            return appointments;
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            return null;
+                        });
                 },
 
-                changeCurrentBarberView(id) {
+                async changeCurrentBarberView(id) {
                     this.chosenBarber = id
+
+                    let now = moment(this.dateRange.start).add(1, "hour").valueOf()
+                    let appointments = await this.fetchAppointments(now, id, this.calendar.view.type);
+                    this.exchangeAppointmentsOnView(appointments)
+
+                    let isNotAdmin = this.chosenBarber !== 1
+                    this.calendar.setOption('selectable', isNotAdmin);
+                    this.calendar.setOption('editable', isNotAdmin);
+                    this.calendar.setOption('selectOverlap', isNotAdmin);
+                    this.calendar.setOption('eventResizableFromStart', isNotAdmin);
+                },
+
+                exchangeAppointmentsOnView(appointments) {
+                    let _thisVue = this
+                    this.removeAppsFromViewOnly()
+                    appointments.forEach(function(event) {
+                        _thisVue.calendar.addEvent(event);
+                    });
+                },
+
+                removeAppsFromViewOnly() {
+                    let oldAppointments = this.calendar.getEvents();
+                    oldAppointments.forEach(function(event) {
+                        event.remove();
+                    });
                 },
 
                 loadEditModal(appToEdit) {

@@ -1,0 +1,68 @@
+.form-input{
+  .form-label{
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+    color: $tertiaryBlack;
+    text-transform: uppercase;
+  }
+  input{
+    background: $quadraWhite;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 0.625rem;
+    color: $primaryBlack;
+    border: 0;
+    width: 100%;
+    padding: 0.45rem 1rem;
+  }
+  &.error{
+    input{
+      border: 1px solid $errorColor;
+    }
+  }
+}
+
+.form-checkbox{
+  display: flex;
+  align-items: center;
+  .form-label{
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+    color: $tertiaryBlack;
+    text-transform: uppercase;
+  }
+  input{
+    position: absolute;
+    width: 0;
+    visibility: hidden;
+  }
+  .checkbox{
+    cursor: pointer;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 0.4rem;
+    transition: all 0.1s ease;
+    background: $quadraWhite;
+    margin-right: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg{
+      transition: all 0.1s ease;
+      width: 2rem;
+      height: auto;
+      opacity: 0;
+    }
+  }
+  input:checked + .checkbox{
+    background: $primaryColor;
+    svg{
+      opacity: 1;
+    }
+  }
+  &.label-right{
+    justify-content: flex-end;
+  }
+}

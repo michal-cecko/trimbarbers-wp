@@ -3,6 +3,8 @@ console.log("General JS has been loaded.")
 class General{
     constructor() {
         this._prepareSwipers()
+        this._prepareParametersRemoval()
+        this._prepareNotifications()
     }
 
     _prepareSwipers() {
@@ -48,8 +50,33 @@ class General{
             }
         });
     }
+
+    _prepareParametersRemoval() {
+        if (window.location.search.includes("c=")) {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            params.delete("c");
+            url.search = params.toString();
+            window.location.replace(url.toString());
+        }
+    }
+
+    _prepareNotifications() {
+        let notifications = document.querySelectorAll(".notification")
+        if(notifications.length) {
+            let x = 2200;
+            let i = 0;
+            notifications.forEach(notification => {
+                setTimeout(function () {
+                    notification.remove()
+                    console.log("removed")
+                }, x + (300 * i))
+                i++;
+            })
+        }
+    }
 }
 
 new General()
 
-export {}
+//export {}

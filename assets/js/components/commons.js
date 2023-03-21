@@ -11,9 +11,13 @@ export default class Commons {
     }
 
     getCurrentTimestamp() {
+        return this.utc(moment());
+    }
+
+    utc(datetime) {
         const utcOffset = 60; // UTC+1
-        const now = moment.utc().utcOffset(utcOffset);
-        return now.valueOf();
+        let x = moment(datetime).utc().utcOffset(utcOffset);
+        return x.valueOf()
     }
 
     leadZero(number) {
@@ -35,5 +39,39 @@ export default class Commons {
             credentials: 'same-origin',
             body: body,
         });
+    }
+
+    validateEmail(email) {
+        const re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    }
+
+    getDayName(num) {
+        if (num === "1") return "Pon";
+        if (num === "2") return "Uto";
+        if (num === "3") return "Str";
+        if (num === "4") return "Štv";
+        if (num === "5") return "Pia";
+        if (num === "6") return "Sob";
+        return "Ned";
+    }
+
+    getMonthName(num) {
+        if (num === "1") return "Január";
+        if (num === "2") return "Február";
+        if (num === "3") return "Marec";
+        if (num === "4") return "Apríl";
+        if (num === "5") return "Máj";
+        if (num === "6") return "Jún";
+        if (num === "7") return "Júl";
+        if (num === "8") return "August";
+        if (num === "9") return "September";
+        if (num === "10") return "Október";
+        if (num === "11") return "November";
+        return "December";
+    }
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }

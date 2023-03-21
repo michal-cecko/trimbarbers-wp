@@ -116,3 +116,54 @@ function getStartAndEndDateOfWeek($timestamp) {
 
   return ["start" => $weekStartDate, "end" => $weekEndDate];
 }
+
+
+function getRandomString($length) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $randomString = '';
+
+    for ($i = 0; $i < $length; $i++) {
+        $index = rand(0, strlen($characters) - 1);
+        $randomString .= $characters[$index];
+    }
+
+    return $randomString;
+}
+
+function getMonthName($num) {
+    if($num == 1) return "Január";
+    if($num == 2) return "Február";
+    if($num == 3) return "Marec";
+    if($num == 4) return "Apríl";
+    if($num == 5) return "Máj";
+    if($num == 6) return "Jún";
+    if($num == 7) return "Júl";
+    if($num == 8) return "August";
+    if($num == 9) return "September";
+    if($num == 10) return "Október";
+    if($num == 11) return "November";
+    return "December";
+}
+
+function getDayName($num) {
+    if($num == 1) return "Pondelok";
+    if($num == 2) return "Utorok";
+    if($num == 3) return "Streda";
+    if($num == 4) return "Štvrtok";
+    if($num == 5) return "Piatok";
+    if($num == 6) return "Sobota";
+    return "Nedeľa";
+}
+
+function getShortDayName($num) {
+    return substr(getDayName($num), 0, 3);
+}
+
+function showNotification($text, $status = "success") {
+    ob_start(); ?>
+    <div class="notificaiton">
+        <?= svgIcon(icon_path(false) . "/icon-check.svg") ?>
+        <span><?= $text ?></span>
+    </div>
+    <?php return ob_get_clean();
+}

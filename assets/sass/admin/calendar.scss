@@ -36,7 +36,8 @@ $activeColor: #b1bb5b;
           font-size: 0.6rem;
         }
 
-        .title {
+        .title,
+        .barber{
           font-size: 0.68rem;
         }
 
@@ -59,6 +60,12 @@ $activeColor: #b1bb5b;
         }
 
         .title {
+          display: inline-block;
+          font-size: 1rem;
+          margin-right: 1rem;
+        }
+
+        .barber {
           display: inline-block;
           font-size: 1rem;
           margin-right: 1rem;

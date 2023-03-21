@@ -164,7 +164,9 @@ function enqueue_custom_scripts_links(): void
     wp_enqueue_script('vue-js', 'https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js');
     wp_enqueue_script('axios-js', 'https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.4/axios.min.js', 'vue-js');
     wp_enqueue_script('moment-js', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js');
+    wp_enqueue_script('moment-js-locale', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/sk.min.js');
     wp_enqueue_style('swiper-css', 'https://cdnjs.cloudflare.com/ajax/libs/Swiper/9.0.5/swiper-bundle.css');
+    wp_enqueue_script('swiper-js', 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js');
     wp_enqueue_script('lordicon-js', 'https://cdn.lordicon.com/libs/mssddfmo/lord-icon-2.1.0.js');
     wp_enqueue_script('aos-js', 'https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js');
     wp_enqueue_script('lazyload-js', script_path() . '/libs/lazyload.min.js');
@@ -213,6 +215,7 @@ function admin_enqueue_scripts()
     wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js');
     wp_enqueue_script('vue-js', 'https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js');
     wp_enqueue_script('moment-js', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js');
+    wp_enqueue_script('moment-js-locale', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/sk.min.js');
     wp_enqueue_style('admin-css', get_template_directory_uri() . '/dist/css/admin/admin.css', FALSE, time());
     wp_enqueue_style('calendar-css', get_template_directory_uri() . '/dist/css/admin/calendar.css', FALSE, time());
     wp_enqueue_script('lordicon-js', 'https://cdn.lordicon.com/libs/mssddfmo/lord-icon-2.1.0.js');

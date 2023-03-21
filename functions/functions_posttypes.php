@@ -108,6 +108,16 @@ function create_post_types()
     );
 
     register_post_type('appointment', $args);
+    register_post_meta( 'appointment', 'cancel_token', array(
+        'type' => 'string',
+        'single' => true,
+        'show_in_rest' => true,
+    ) );
+    register_post_meta( 'appointment', 'has_been_reminded', array(
+        'type' => 'boolean',
+        'single' => true,
+        'show_in_rest' => true,
+    ) );
 
     //
     add_action('load-edit.php', function () {
