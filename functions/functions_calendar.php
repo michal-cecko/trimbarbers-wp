@@ -322,7 +322,7 @@ function get_appointments()
         if ($type === "free") {
             $return[$id] = [
                 'type' => $type,
-                'barber' => $barber->display_name,
+                'barber' => $barber->first_name,
                 'barberID' => $barber->ID,
                 'note' => get_field("appointment_note"),
                 'datetime' => get_field("appointment_datetime")
@@ -331,7 +331,7 @@ function get_appointments()
             $service = get_field("appointment_service");
             $return[$id] = [
                 'type' => $type,
-                'barber' => $barber->display_name,
+                'barber' => $barber->first_name,
                 'barberID' => $barber->ID,
                 'serviceID' => $service->ID,
                 'service' => get_the_title($service),

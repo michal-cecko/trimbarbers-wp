@@ -50,15 +50,15 @@ $services = new WP_Query($args);
                             $photo = get_field("profile_image", $id)
                             ?>
                             <div class="barber" :class="barber.id === <?= $barber->ID ?> ? 'chosen' : ''"
-                                 @click="chooseBarber(<?= $barber->ID ?>, '<?= $barber->display_name ?>', '<?= $photo ?>')">
+                                 @click="chooseBarber(<?= $barber->ID ?>, '<?= $barber->first_name ?>', '<?= $photo ?>')">
                                 <div class="img-container">
                                     <?php if ($photo) : ?>
-                                        <img src="<?= $photo ?>" alt="<?= $barber->display_name ?>">
+                                        <img src="<?= $photo ?>" alt="<?= $barber->first_name ?>">
                                     <?php else : ?>
                                         <?= svgIcon(icon_path(false) . "/icon-question_mark.svg") ?>
                                     <?php endif ?>
                                 </div>
-                                <div class="name"><?= $barber->display_name ?></div>
+                                <div class="name"><?= $barber->first_name ?></div>
                             </div>
                         <?php endforeach ?>
                     </div>

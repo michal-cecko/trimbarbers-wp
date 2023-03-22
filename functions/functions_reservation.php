@@ -32,7 +32,7 @@ function get_available_dates()
             $barber = $barbers[$b];
         }
         //echo "barberID: " . $barber->ID . "<br>";
-        //echo "barber: " . ($barber->display_name) . "<br>";
+        //echo "barber: " . ($barber->first_name) . "<br>";
 
         $worktime = get_field("worktime", "user_" . $barber->ID);
         $lunchtime = get_field("lunchtime", "user_" . $barber->ID);

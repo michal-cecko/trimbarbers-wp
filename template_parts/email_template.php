@@ -213,7 +213,7 @@
                         <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                         <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
                         <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
-                        <b>Barber</b>: <?= $barber->display_name ?><br>
+                        <b>Barber</b>: <?= $barber->first_name ?><br>
                     <?php endif ?>
 
                     <br>
@@ -236,7 +236,7 @@
                     <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                     <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
                     <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
-                    <b>Barber</b>: <?= $barber->display_name ?><br>
+                    <b>Barber</b>: <?= $barber->first_name ?><br>
 
                     <br>
 
@@ -253,7 +253,7 @@
                     <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                     <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
                     <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
-                    <b>Barber</b>: <?= $barber->display_name ?><br>
+                    <b>Barber</b>: <?= $barber->first_name ?><br>
 
                     <?php $content = ob_get_clean();
                 }
@@ -270,7 +270,7 @@
                         <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                         <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
                         <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
-                        <b>Barber</b>: <?= $barber->display_name ?><br>
+                        <b>Barber</b>: <?= $barber->first_name ?><br>
                     <?php endif ?>
 
                     <?php $content = ob_get_clean();

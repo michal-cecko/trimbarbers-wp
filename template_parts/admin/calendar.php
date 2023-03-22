@@ -31,7 +31,7 @@ $barbersFinal = [];
 foreach ($barbers as $barber) {
     $barbersFinal[$barber->ID] = [
         'id' => $barber->ID,
-        'name' => $barber->display_name,
+        'name' => $barber->first_name,
         'profileImage' => get_field("profile_image", "user_" . $barber->ID),
     ];
 }
@@ -44,7 +44,7 @@ foreach ($barbers as $barber) {
     <div id="services-durations" style="display:none;"
          data-durations="<?= htmlspecialchars(json_encode($durations), ENT_QUOTES, 'UTF-8'); ?>"></div>
     <div id="logged-user" style="display:none;" data-id="<?= $currentUser->ID ?>"
-         data-name="<?= $currentUser->display_name ?>" data-role="<?= $currentUserRole ?>"></div>
+         data-name="<?= $currentUser->first_name ?>" data-role="<?= $currentUserRole ?>"></div>
     <div id="barbers" style="display:none;"
          data-barbers="<?= htmlspecialchars(json_encode($barbersFinal), ENT_QUOTES, 'UTF-8') ?>"></div>
     <div class="header-wrapper mb-3 d-flex align-items-center justify-content-between flex-wrap">
