@@ -7,7 +7,7 @@
 <?php
 $args = [
     'post_type' => 'service',
-    'post_status' => 'published',
+    'post_status' => 'publish',
     'posts_per_page' => -1
 ];
 $services = new WP_Query($args);

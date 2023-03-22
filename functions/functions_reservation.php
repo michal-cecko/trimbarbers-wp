@@ -217,12 +217,12 @@ function make_reservation()
     ], $barberID, $postID, "appointment");
 
 
-    $realBarberID = get_field("appointment_barber", $postID);
     $receiver = $customer['email'];
-    $barberInfo = get_userdata($realBarberID);
-    $barberReceiver = $barberInfo->user_email;
     if (!empty($receiver)) reservation_notification($receiver, "new", $postID, false);
-    if (!empty($barberReceiver)) reservation_notification($barberReceiver, "new", $postID, true);
+
+    if($reservationsEmail = get_field("reservations_email", "options")) {
+        reservation_notification($reservationsEmail, "new", $postID, true);
+    }
 
     wp_send_json(["id" => $postID, 'service' => $service], 200);
 }
