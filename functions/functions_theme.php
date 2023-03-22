@@ -1,5 +1,5 @@
 <?php
-$version = wp_get_theme()->parent()->Version ?? "1.0.0";
+$version = wp_get_theme()->parent()->Version ?? "1.1.0";
 DEFINE("VERSION", WP_DEBUG ? time() : $version);
 
 // THEME SETUP
@@ -205,6 +205,7 @@ function enqueue_custom_scripts_links(): void
 
 function admin_enqueue_scripts()
 {
+    $user = wp_get_current_user();
     $defaultPHPVars = [
         'homeUrl' => get_home_url(),
         'ajaxUrl' => admin_url('admin-ajax.php'),
@@ -220,6 +221,9 @@ function admin_enqueue_scripts()
     wp_enqueue_style('calendar-css', get_template_directory_uri() . '/dist/css/admin/calendar.css', FALSE, time());
     wp_enqueue_script('lordicon-js', 'https://cdn.lordicon.com/libs/mssddfmo/lord-icon-2.1.0.js');
 
+    if( in_array('barber', $user->roles) || in_array('together-barber', $user->roles) ){
+        wp_enqueue_style('barbers-css', get_template_directory_uri() . '/dist/css/admin/barber_role.css', FALSE, time());
+    }
 
     wp_register_script(
         "admin-js",

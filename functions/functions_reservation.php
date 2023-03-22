@@ -19,72 +19,73 @@ function get_available_dates()
         ], 403);
     }
     $serviceDuration = get_field("serv-duration", $serviceID);
-    if ($barberID < 1) {
-        $barbers = get_users([
-            'role' => 'barber',
-        ]);
-    }
-
-    $args = [
-        'post_type' => 'appointment',
-        'post_status' => 'publish',
-        'posts_per_page' => -1,
-    ];
-    $dateCond = [
-        "relation" => "OR",
-        [
-            'key' => 'appointment_datetime_from',
-            'value' => date("Ymd") . " 00:00:00",
-            'compare' => '<=',
-            'type' => 'DATETIME',
-        ],
-        [
-            'key' => 'appointment_datetime_to',
-            'value' => date("Ymd") . " 00:00:00",
-            'compare' => '<=',
-            'type' => 'DATETIME',
-        ]
-    ];
-    if ($barberID > 0) {
-        $args['meta_query'] = [
-            'relation' => 'AND',
-            [
-                'key' => 'appointment_barber',
-                'value' => $barberID,
-                'compare' => '='
-            ],
-            $dateCond,
-        ];
-    } else {
-        $args['meta_query'] = $dateCond;
-    }
-    $reservations = new WP_Query($args);
-
-    $currentDate = (new DateTime())->modify("-1 day");
-    $b = 0;
-    $obsadeneArr = [];
-    if ($reservations->have_posts()) :
-        while ($reservations->have_posts()) : $reservations->the_post();
-            $datetime = get_field("appointment_datetime", get_the_ID());
-
-            $start = DateTime::createFromFormat("Y-m-d H:i:s", $datetime['from']);
-            $end = DateTime::createFromFormat("Y-m-d H:i:s", $datetime['to']);
-
-            $obsadeneArr[$start->format("Y-m-d")][] = ['start' => $start->format("H:i"), "end" => $end->format("H:i")];
-        endwhile;
-        wp_reset_postdata();
-    endif;
+    $barbers = getBarbers();
 
     $finalDates = [];
+    $b = 0;
     while (($barberID < 1 && $b < count($barbers)) || ($barberID > 0 && $b < 1)) :
+        $currentDate = (new DateTime())->modify("-1 day");
 
         if ($barberID > 0) {
             $barber = get_user_by("ID", $barberID);
         } else {
             $barber = $barbers[$b];
         }
+        //echo "barberID: " . $barber->ID . "<br>";
+        //echo "barber: " . ($barber->display_name) . "<br>";
+
         $worktime = get_field("worktime", "user_" . $barber->ID);
         $lunchtime = get_field("lunchtime", "user_" . $barber->ID);
+
+        $args = [
+            'post_type' => 'appointment',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+        ];
+        $dateCond = [
+            "relation" => "OR",
+            [
+                'key' => 'appointment_datetime_from',
+                'value' => date("Y-m-d") . " 00:00:00",
+                'compare' => '<=',
+                'type' => 'DATETIME',
+            ],
+            [
+                'key' => 'appointment_datetime_to',
+                'value' => date("Y-m-d") . " 00:00:00",
+                'compare' => '<=',
+                'type' => 'DATETIME',
+            ]
+        ];
+        /*$args['meta_query'] = [
+            'relation' => 'AND',
+            [
+                'key' => 'appointment_barber',
+                'value' => $barber->ID,
+                'compare' => '='
+            ],
+            $dateCond,
+        ];
+        var_dump($args);*/
+        $reservations = new WP_Query($args);
+        //var_dump(count($reservations->get_posts()));
+
+        $obsadeneArr = [];
+        if ($reservations->have_posts()) :
+            while ($reservations->have_posts()) : $reservations->the_post();
+                $datetime = get_field("appointment_datetime", get_the_ID());
+
+                $start = DateTime::createFromFormat("Y-m-d H:i:s", $datetime['from']);
+                $end = DateTime::createFromFormat("Y-m-d H:i:s", $datetime['to']);
+
+                $obsadeneArr[$start->format("Y-m-d")][] = ['start' => $start->format("H:i"), "end" => $end->format("H:i")];
+            endwhile;
+            wp_reset_postdata();
+        endif;
+
+        //var_dump($obsadeneArr);
+
+
 
         for ($i = 0; $i < 60; $i++) :
             $date = $currentDate->modify("+1 day");
@@ -92,7 +93,6 @@ function get_available_dates()
             $currentDate = $date;
             //echo "currentDate: " . $date->format("d.m.Y") . "<br>";
             $dateFormat = $currentDate->format("Y-m-d");
-
             $obsadene = $obsadeneArr[$dateFormat] ?? false;
 
             //work start is currentTime
@@ -104,7 +104,7 @@ function get_available_dates()
 
             //echo "Work from: " . $worktime['start'] . " to " . $worktime['end'] . "<br>";
             //echo "Lunch from: " . $lunchStart . " to " . $lunchEnd . "<br>";
-            //print_r($obsadene);
+            //var_dump($obsadene);
             //echo "<br>";
 
             //echo "while: " . $currentTime->format("H:i") . " <= " . $workEndWhile;
@@ -127,12 +127,12 @@ function get_available_dates()
                         $terminStart = $time['start'];
                         $terminEnd = $time['end'];
 
-                        $canStart = $currentStart <= $terminEnd;
+                        //$canStart = $currentStart <= $terminEnd;
                         //echo "$currentStart <= $terminEnd <br>";
                         $canEnd = $currentEnd <= $terminStart || $currentStart >= $terminEnd;
                         //echo "$currentEnd <= $terminStart " . " || " . " $currentStart >= $terminEnd <br>";
 
-                        if (!($canStart && $canEnd)) {
+                        if (!(/*$canStart &&*/ $canEnd)) {
                             $ok = false;
                             break;
                         }
@@ -141,12 +141,13 @@ function get_available_dates()
                 if ($ok) {
                     //echo "is ok<br>";
                     $finalDates[$currentDate->format("n")][$dateFormat][$currentStart] = 1;
+                } else if (!isset($finalDates[$currentDate->format("n")][$dateFormat][$currentStart])) {
+                    //echo "is NOT really ok<br>";
+                    $finalDates[$currentDate->format("n")][$dateFormat][$currentStart] = 0;
                 } else {
                     //echo "is NOT ok<br>";
-                    $finalDates[$currentDate->format("n")][$dateFormat][$currentStart] = 0;
                 }
             endwhile;
-            //var_dump($finalDates[$currentDate->format("Y-m-d")]);
         endfor;
 
         $b++;
@@ -215,8 +216,13 @@ function make_reservation()
         'note' => $customer['note'],
     ], $barberID, $postID, "appointment");
 
+
+    $realBarberID = get_field("appointment_barber", $postID);
     $receiver = $customer['email'];
-    if (!empty($receiver)) reservation_notification($receiver, "new", $postID);
+    $barberInfo = get_userdata($realBarberID);
+    $barberReceiver = $barberInfo->user_email;
+    if (!empty($receiver)) reservation_notification($receiver, "new", $postID, false);
+    if (!empty($barberReceiver)) reservation_notification($barberReceiver, "new", $postID, true);
 
     wp_send_json(["id" => $postID, 'service' => $service], 200);
 }

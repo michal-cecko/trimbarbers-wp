@@ -139,10 +139,15 @@
                     $service = $data['service'];
                     $servicePrice = get_field("serv-price", $service->ID);
                     $serviceTitle = get_the_title($service->ID);
+                    $sendingToBarber = $data['sendingToBarber'] ?? false;
                     $id = $data['id'];
 
                     if($type === "new") {
-                        $title = "Potvrdenie o záväznej rezervácii";
+                        if($sendingToBarber) {
+                            $title = "Nová rezervácia";
+                        } else {
+                            $title = "Potvrdenie o záväznej rezervácii";
+                        }
                         $subtitle = $serviceTitle . " (" . $servicePrice. "€)";
                     } else if($type === "update") {
                         $title = "Zmena rezervácie";
@@ -193,17 +198,23 @@
                 $date = new DateTime(get_field('appointment_datetime_from', $id));
                 $customer = get_field('appointment_customer', $id);
                 $note = get_field('appointment_note', $id);
-                $barber = $data['barber'];
+                $barber = get_user_by("ID", $data['barber']);
 
                 if($type === "new") { ob_start(); ?>
 
-                    Dobrý deň, ďakujeme za Vašu rezervíciu a tešíme sa na Vašu návštevu.<br><br>
-
-                    <b>DETAILY VAŠEJ REZERVÁCIE</b><br>
-                    <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
-                    <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
-                    <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
-                    <b>Barber</b>: <?= $barber->display_name ?><br>
+                    <?php if ($sendingToBarber) : ?>
+                        Zákazník <?= $customer['name'] ?> si zarezervoval naslednovný termín:<br><br>
+                        <b>DETAILY REZERVÁCIE</b><br>
+                        <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
+                        <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
+                    <?php else : ?>
+                        Dobrý deň, ďakujeme za Vašu rezervíciu a tešíme sa na Vašu návštevu.<br><br>
+                        <b>DETAILY VAŠEJ REZERVÁCIE</b><br>
+                        <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
+                        <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
+                        <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
+                        <b>Barber</b>: <?= $barber->display_name ?><br>
+                    <?php endif ?>
 
                     <br>
 
@@ -249,13 +260,18 @@
                 //cancel
                 else { ob_start(); ?>
 
-                    Dobrý deň, je nám to ľúto, ale Vaša rezervácia bola zrušená.<br><br>
-
-                    <b>DETAILY VAŠEJ REZERVÁCIE</b><br>
-                    <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
-                    <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
-                    <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
-                    <b>Barber</b>: <?= $barber->display_name ?><br>
+                    <?php if ($sendingToBarber) : ?>
+                        Zákazník zrušil rezerváciu nasledovného termínu:<br><br>
+                        <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
+                        <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
+                    <?php else : ?>
+                        Dobrý deň, je nám to ľúto, ale Vaša rezervácia bola zrušená.<br><br>
+                        <b>DETAILY VAŠEJ REZERVÁCIE</b><br>
+                        <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
+                        <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
+                        <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
+                        <b>Barber</b>: <?= $barber->display_name ?><br>
+                    <?php endif ?>
 
                     <?php $content = ob_get_clean();
                 } ?>
@@ -272,7 +288,7 @@
                     </td>
                 </tr>
 
-                <?php if (in_array($type, ['new', 'update', 'notification'])) : ?>
+                <?php if (in_array($type, ['new', 'update', 'notification']) && !$sendingToBarber) : ?>
 
                     <?php
                     $id = $data['id'];

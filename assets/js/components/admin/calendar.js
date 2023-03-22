@@ -28,6 +28,7 @@ class ReservationCalendar extends Commons {
                 appointment: {},
                 freeAppColor: "#0b99a6",
                 serviceColors: {},
+                serviceDurations: {},
 
                 createModal: null,
                 editModal: null,
@@ -37,8 +38,11 @@ class ReservationCalendar extends Commons {
                 appointmentToDelete: null,
 
                 loggedInBarber: null,
-                chosenBarber: null,
+                chosenBarberOnView: null,
+                chosenBarberInForms: null,
                 barbers: null,
+
+                buttonLoader: false,
 
                 dateRange: {start: null, end: null},
 
@@ -56,16 +60,23 @@ class ReservationCalendar extends Commons {
                 this.editModal = new bootstrap.Modal(document.getElementById('editAppointmentModal'))
                 this.deleteModal = new bootstrap.Modal(document.getElementById('deleteAppointmentModal'))
 
-                this.loggedInBarber = document.getElementById('logged-user').dataset;
-                if(this.loggedInBarber.role === "administrator") {
-                    this.chosenBarber = -1;
-                } else {
-                    this.chosenBarber = parseInt(this.loggedInBarber.id);
-                }
                 let barbers = JSON.parse(document.getElementById('barbers').dataset.barbers)
                 this.barbers = Object.assign({}, barbers);
 
+                this.loggedInBarber = document.getElementById('logged-user').dataset;
+                let loggedInId = parseInt(this.loggedInBarber.id);
+                if(this.loggedInBarber.role === "administrator" || !this.barbers[loggedInId]) {
+                    this.chosenBarberOnView = -1;
+                    const firstKey = Object.keys(this.barbers)[0];
+                    if(this.barbers[firstKey]) {
+                        this.chosenBarberInForms = this.barbers[firstKey].id;
+                    }
+                } else {
+                    this.chosenBarberOnView = this.chosenBarberInForms = loggedInId;
+                }
+
                 this.serviceColors = JSON.parse(document.getElementById('services-colors').dataset.colors)
+                this.serviceDurations = JSON.parse(document.getElementById('services-durations').dataset.durations)
                 this.initCalendar()
             },
             methods: {
@@ -73,7 +84,7 @@ class ReservationCalendar extends Commons {
                     let _thisVue = this
 
                     let now = _thisClass.getCurrentTimestamp()
-                    let appointments = await this.fetchAppointments(now, this.chosenBarber, "week");
+                    let appointments = await this.fetchAppointments(now, this.chosenBarberOnView, "week");
 
                     const calendarEl = document.getElementById('calendar')
                     let calendar = new Calendar(calendarEl, {
@@ -81,10 +92,11 @@ class ReservationCalendar extends Commons {
                         locale: skLocale,
 
                         nowIndicator: true,
-                        editable: _thisVue.chosenBarber !== -1,
-                        selectable: _thisVue.chosenBarber !== -1,
-                        selectOverlap: _thisVue.chosenBarber !== -1,
-                        eventResizableFromStart: _thisVue.chosenBarber !== -1,
+                        select: false,
+                        editable: false,
+                        selectable: false,
+                        selectOverlap: false,
+                        eventResizableFromStart: false,
                         initialView: 'timeGridWeek',
 
                         headerToolbar: {
@@ -121,14 +133,6 @@ class ReservationCalendar extends Commons {
                             return `${day}, ${dayNum}${month}`;
                         },
 
-                        select: function (info) {
-                            if(_thisVue.chosenBarber === -1) return
-
-                            _thisVue.createModal.show();
-                            _thisVue.appointment.datetime.start = moment(info.start).format('YYYY-MM-DD HH:mm:ss')
-                            _thisVue.appointment.datetime.end = moment(info.end).format('YYYY-MM-DD HH:mm:ss')
-                        },
-
                         eventDidMount: function (info) {
                             let html = '<span class="delete-button">&times;</span>';
                             let eventEl = info.el;
@@ -137,8 +141,6 @@ class ReservationCalendar extends Commons {
                                 eventEl.insertAdjacentHTML('beforeend', html);
                                 deleteButtonEl = eventEl.querySelector('.delete-button');
                                 deleteButtonEl.addEventListener('click', function () {
-                                    if(_thisVue.chosenBarber === -1) return;
-
                                     _thisVue.resetAppointmentToDeleteVariable()
                                     _thisVue.appointmentToDelete = info.event
                                     _thisVue.deleteModal.show();
@@ -153,7 +155,7 @@ class ReservationCalendar extends Commons {
                             let html = '<div class="event-content-container ' + view + '"><div class="time">' + moment(event.start).format('HH:mm') + ' - ' + moment(event.end).format('HH:mm') + '</div>';
                             html += '<div class="title">' + event.title + '</div>';
 
-                            if(_thisVue.chosenBarber === -1) {
+                            if(_thisVue.chosenBarberOnView === -1) {
                                 if(_thisVue.barbers[props.barberID])
                                 html += '<div class="barber">barber: ' + _thisVue.barbers[props.barberID].name + '</div>';
                             }
@@ -190,24 +192,12 @@ class ReservationCalendar extends Commons {
                             if (info.jsEvent.target.classList.contains('delete-button')) {
                                 return false;
                             }
-                            if(_thisVue.chosenBarber === -1) {
-                                return false;
-                            }
                             _thisVue.editingAppointment = info.event;
                             _thisVue.loadEditModal(info.event);
-                            console.log(this.appointment);
                             _thisVue.editModal.show();
                         },
-                        eventDrop: function (info) {
-                            if(_thisVue.chosenBarber === -1) return
-                            let app = info.event
-                            _thisVue.moveAppointment(app.extendedProps.id, moment(app.start).format('YYYY-MM-DD HH:mm:ss'), moment(app.end).format('YYYY-MM-DD HH:mm:ss'))
-                        },
-                        eventResize: function (info) {
-                            if(_thisVue.chosenBarber === -1) return
-                            let app = info.event
-                            _thisVue.moveAppointment(app.extendedProps.id, moment(app.start).format('YYYY-MM-DD HH:mm:ss'), moment(app.end).format('YYYY-MM-DD HH:mm:ss'))
-                        },
+                        eventDrop: false,
+                        eventResize: false,
                         events: appointments,
 
                         viewDidMount: async function(view) {
@@ -218,7 +208,7 @@ class ReservationCalendar extends Commons {
                             _thisVue.dateRange.end = end
 
                             let fetchStart = _thisClass.utc(moment(start).add(1, "hour"))
-                            let appointments = await _thisVue.fetchAppointments(fetchStart, _thisVue.chosenBarber, view.type)
+                            let appointments = await _thisVue.fetchAppointments(fetchStart, _thisVue.chosenBarberOnView, view.type)
                             _thisVue.exchangeAppointmentsOnView(appointments)
                         }
                     })
@@ -232,7 +222,7 @@ class ReservationCalendar extends Commons {
                         _thisVue.dateRange.end = end
 
                         let fetchStart = _thisClass.utc(moment(start).add(1, "hour"))
-                        let appointments = await _thisVue.fetchAppointments(fetchStart, _thisVue.chosenBarber, calendar.view.type)
+                        let appointments = await _thisVue.fetchAppointments(fetchStart, _thisVue.chosenBarberOnView, calendar.view.type)
                         _thisVue.exchangeAppointmentsOnView(appointments)
                     });
                     this.calendar = calendar;
@@ -246,7 +236,7 @@ class ReservationCalendar extends Commons {
 
                 async createAppointment() {
                     let data = new FormData();
-                    let barberID = parseInt(this.chosenBarber);
+                    let barberID = parseInt(this.chosenBarberInForms);
                     data.append("notify", this.notify)
                     data.append("barberID", barberID)
                     data.append("appointment", JSON.stringify(this.appointment))
@@ -254,9 +244,10 @@ class ReservationCalendar extends Commons {
                     data.append("nonce", _thisClass.nonce)
 
                     try {
+                        this.buttonLoader = true;
                         let response = await _thisClass.WPPostAjax(data);
                         let responseData = await response.json();
-                        
+
                         this.calendar.addEvent({
                             title: this.appointment.type === "free" ? "Voľno" : this.appointment.customer.name,
                             start: this.appointment.datetime.start,
@@ -274,9 +265,11 @@ class ReservationCalendar extends Commons {
                             color: this.getActiveColor(this.appointment.type, this.appointment.serviceID),
                             textColor: '#ffffff'
                         });
+                        this.buttonLoader = false;
 
                         this.createModal.hide();
                         this.notify = false;
+
 
                         return true;
                     } catch (error) {
@@ -289,11 +282,11 @@ class ReservationCalendar extends Commons {
                     if(!this.editingAppointment) return;
 
                     let data = new FormData();
-                    let barberID = parseInt(this.chosenBarber);
+                    let barberID = parseInt(this.chosenBarberInForms);
 
                     data.append("id", this.editingAppointment.extendedProps.id)
                     data.append("notify", this.notify)
-                    data.append("barberID", this.chosenBarber)
+                    data.append("barberID", barberID)
                     data.append("appointment", JSON.stringify(this.appointment))
                     data.append("action", "edit_appointment")
                     data.append("nonce", _thisClass.nonce)
@@ -301,6 +294,7 @@ class ReservationCalendar extends Commons {
                     console.log(this.appointment.datetime.start)
 
                     try {
+                        this.buttonLoader = true;
                         let response = await _thisClass.WPPostAjax(data);
                         console.log(response)
                         let responseData = await response.json();
@@ -326,6 +320,7 @@ class ReservationCalendar extends Commons {
                             textColor: '#ffffff'
                         });
 
+                        this.buttonLoader = false;
                         this.editModal.hide();
                         this.notify = false;
 
@@ -343,29 +338,13 @@ class ReservationCalendar extends Commons {
                     data.append("action", "remove_appointment")
                     data.append("nonce", _thisClass.nonce)
                     try {
+                        this.buttonLoader = true;
                         let response = await _thisClass.WPPostAjax(data)
                         response = await response.json();
                         this.appointmentToDelete.remove()
                         this.deleteModal.hide();
                         this.notify = false;
-                        console.log(response)
-                    } catch (error) {
-                        console.error(error);
-                        return null;
-                    }
-                },
-
-                async moveAppointment(id, newStart, newEnd) {
-                    let data = new FormData();
-                    data.append("id", id)
-                    data.append("newStart", newStart)
-                    data.append("newEnd", newEnd)
-                    data.append("action", "move_appointment")
-                    data.append("nonce", _thisClass.nonce)
-
-                    try {
-                        let response = await _thisClass.WPPostAjax(data);
-                        response = await response.json();
+                        this.buttonLoader = false;
                         console.log(response)
                     } catch (error) {
                         console.error(error);
@@ -420,17 +399,11 @@ class ReservationCalendar extends Commons {
                 },
 
                 async changeCurrentBarberView(id) {
-                    this.chosenBarber = id
+                    this.chosenBarberOnView = this.chosenBarberInForms = id
 
                     let now = moment(this.dateRange.start).add(1, "hour").valueOf()
                     let appointments = await this.fetchAppointments(now, id, this.calendar.view.type);
                     this.exchangeAppointmentsOnView(appointments)
-
-                    let isNotAdmin = this.chosenBarber !== 1
-                    this.calendar.setOption('selectable', isNotAdmin);
-                    this.calendar.setOption('editable', isNotAdmin);
-                    this.calendar.setOption('selectOverlap', isNotAdmin);
-                    this.calendar.setOption('eventResizableFromStart', isNotAdmin);
                 },
 
                 exchangeAppointmentsOnView(appointments) {
@@ -451,17 +424,19 @@ class ReservationCalendar extends Commons {
                 loadEditModal(appToEdit) {
                     this.resetAppointmentVariable()
                     let type = appToEdit.extendedProps.type
-                    console.log(appToEdit.extendedProps)
+
                     if(type !== "free") {
                         this.appointment.customer = appToEdit.extendedProps.customer
                         this.appointment.serviceID = appToEdit.extendedProps.serviceID
                     }
+                    this.chosenBarberInForms = appToEdit.extendedProps.barberID
                     this.appointment.type = appToEdit.extendedProps.type
                     this.appointment.note = appToEdit.extendedProps.note
                     this.appointment.datetime = {
-                        start: appToEdit.start,
-                        end: appToEdit.end
+                        start: moment(appToEdit.start).format("YYYY-MM-DD HH:mm:ss"),
+                        end: moment(appToEdit.end).format("YYYY-MM-DD HH:mm:ss"),
                     }
+                    console.log(this.appointment.datetime)
                 },
 
                 resetAppointmentVariable() {
@@ -481,6 +456,14 @@ class ReservationCalendar extends Commons {
                     return appointmentType === "free" ? this.freeAppColor : this.serviceColors[serviceID]
                 }
             },
+            watch: {
+                'appointment.serviceID'(newID) {
+                    let start = this.appointment.datetime.start
+                    if(start && this.appointment.type === "appointment") {
+                        this.appointment.datetime.end = moment(start, 'YYYY-MM-DD HH:mm:ss').add(parseInt(this.serviceDurations[newID]), "minutes").format("YYYY-MM-DD HH:mm:ss")
+                    }
+                },
+            }
         });
     }
 }

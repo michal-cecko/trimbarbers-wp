@@ -62,13 +62,14 @@ function svgIcon($path, array $attributes = [])
             $attrHtml .= " " . $attr . "='" . implode(" ", $value) . "' ";
         }
         $html = substr_replace($html, $attrHtml, $svgTagEndPosition, 0);
-        if(strpos($html, "<svgsvg") !== false) $html = str_replace("<svgsvg", "<svg", $html);
+        if (strpos($html, "<svgsvg") !== false) $html = str_replace("<svgsvg", "<svg", $html);
     }
 
     return $html;
 }
 
-function printMenu($location) {
+function printMenu($location)
+{
     $menu = wp_get_menu_array("footer-links");
     if ($menu) {
         foreach ($menu as $key => $item) { ?>
@@ -86,39 +87,45 @@ function printMenu($location) {
 
 // ASSETS PATHS
 
-function image_path($uri = true) {
+function image_path($uri = true)
+{
     return ($uri ? get_template_directory_uri() : get_template_directory()) . "/assets/images";
 }
 
-function icon_path($uri = true) {
+function icon_path($uri = true)
+{
     return ($uri ? get_template_directory_uri() : get_template_directory()) . "/assets/icons";
 }
 
-function script_path($uri = true) {
+function script_path($uri = true)
+{
     return ($uri ? get_template_directory_uri() : get_template_directory()) . "/assets/js";
 }
 
-function favicon_path($uri = true) {
+function favicon_path($uri = true)
+{
     return ($uri ? get_template_directory_uri() : get_template_directory()) . "/assets/favicon";
 }
 
 
-
-function js_json_decode($json) {
+function js_json_decode($json)
+{
     return json_decode(str_replace("\\", "", $json), true);
 }
 
 
-function getStartAndEndDateOfWeek($timestamp) {
-  $currentDayOfWeek = date('N', $timestamp); // Get current day of the week (1 = Monday, 7 = Sunday)
-  $weekStartDate = date('Y-m-d', strtotime("-".($currentDayOfWeek-1)." days", $timestamp)); // Calculate the start date of the current week
-  $weekEndDate = date('Y-m-d', strtotime("+".(7-$currentDayOfWeek)." days", $timestamp)); // Calculate the end date of the current week
+function getStartAndEndDateOfWeek($timestamp)
+{
+    $currentDayOfWeek = date('N', $timestamp); // Get current day of the week (1 = Monday, 7 = Sunday)
+    $weekStartDate = date('Y-m-d', strtotime("-" . ($currentDayOfWeek - 1) . " days", $timestamp)); // Calculate the start date of the current week
+    $weekEndDate = date('Y-m-d', strtotime("+" . (7 - $currentDayOfWeek) . " days", $timestamp)); // Calculate the end date of the current week
 
-  return ["start" => $weekStartDate, "end" => $weekEndDate];
+    return ["start" => $weekStartDate, "end" => $weekEndDate];
 }
 
 
-function getRandomString($length) {
+function getRandomString($length)
+{
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $randomString = '';
 
@@ -130,40 +137,81 @@ function getRandomString($length) {
     return $randomString;
 }
 
-function getMonthName($num) {
-    if($num == 1) return "Január";
-    if($num == 2) return "Február";
-    if($num == 3) return "Marec";
-    if($num == 4) return "Apríl";
-    if($num == 5) return "Máj";
-    if($num == 6) return "Jún";
-    if($num == 7) return "Júl";
-    if($num == 8) return "August";
-    if($num == 9) return "September";
-    if($num == 10) return "Október";
-    if($num == 11) return "November";
+function getMonthName($num)
+{
+    if ($num == 1) return "Január";
+    if ($num == 2) return "Február";
+    if ($num == 3) return "Marec";
+    if ($num == 4) return "Apríl";
+    if ($num == 5) return "Máj";
+    if ($num == 6) return "Jún";
+    if ($num == 7) return "Júl";
+    if ($num == 8) return "August";
+    if ($num == 9) return "September";
+    if ($num == 10) return "Október";
+    if ($num == 11) return "November";
     return "December";
 }
 
-function getDayName($num) {
-    if($num == 1) return "Pondelok";
-    if($num == 2) return "Utorok";
-    if($num == 3) return "Streda";
-    if($num == 4) return "Štvrtok";
-    if($num == 5) return "Piatok";
-    if($num == 6) return "Sobota";
+function getDayName($num)
+{
+    if ($num == 1) return "Pondelok";
+    if ($num == 2) return "Utorok";
+    if ($num == 3) return "Streda";
+    if ($num == 4) return "Štvrtok";
+    if ($num == 5) return "Piatok";
+    if ($num == 6) return "Sobota";
     return "Nedeľa";
 }
 
-function getShortDayName($num) {
+function getShortDayName($num)
+{
     return substr(getDayName($num), 0, 3);
 }
 
-function showNotification($text, $status = "success") {
+function showNotification($text, $status = "success")
+{
     ob_start(); ?>
     <div class="notificaiton">
         <?= svgIcon(icon_path(false) . "/icon-check.svg") ?>
         <span><?= $text ?></span>
     </div>
     <?php return ob_get_clean();
+}
+
+function getBarbers($idsOnly = false)
+{
+    $args = [
+        'role' => 'barber',
+        'meta_query' => [
+            "relation" => "AND",
+            [
+                'key' => 'worktime_start',
+                'compare' => 'EXISTS',
+            ],
+            [
+                'key' => 'worktime_end',
+                'compare' => 'EXISTS',
+            ],
+            [
+                'key' => 'lunchtime_start',
+                'compare' => 'EXISTS',
+            ],
+            [
+                'key' => 'lunchtime_end',
+                'compare' => 'EXISTS',
+            ],
+        ],
+    ];
+    if ($idsOnly) $args['fields'] = "ID";
+    return get_users($args);
+}
+
+function getCurrentUserRole()
+{
+    $current_user = wp_get_current_user();
+    if (!empty($current_user->roles)) {
+        return $current_user->roles[0];
+    }
+    return null;
 }

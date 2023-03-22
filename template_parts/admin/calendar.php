@@ -13,23 +13,20 @@ $args = [
 $services = new WP_Query($args);
 
 $colors = [];
+$durations = [];
 if ($services->have_posts()) :
     while ($services->have_posts()) :
         $services->the_post();
         $colors[get_the_ID()] = get_field("admin_color");
+        $durations[get_the_ID()] = get_field("serv-duration");
     endwhile;
     wp_reset_query();
 endif;
 
 $currentUser = wp_get_current_user();
-if(!current_user_can('barber')) {
+$currentUserRole = getCurrentUserRole();
 
-}
-
-
-$barbers = get_users([
-    'role' => 'barber',
-]);
+$barbers = getBarbers();
 $barbersFinal = [];
 foreach ($barbers as $barber) {
     $barbersFinal[$barber->ID] = [
@@ -44,30 +41,42 @@ foreach ($barbers as $barber) {
 <div id="calendarContainer">
     <div id="services-colors" style="display:none;"
          data-colors="<?= htmlspecialchars(json_encode($colors), ENT_QUOTES, 'UTF-8'); ?>"></div>
+    <div id="services-durations" style="display:none;"
+         data-durations="<?= htmlspecialchars(json_encode($durations), ENT_QUOTES, 'UTF-8'); ?>"></div>
     <div id="logged-user" style="display:none;" data-id="<?= $currentUser->ID ?>"
-         data-name="<?= $currentUser->display_name ?>" data-role="<?= $currentUser->roles[0] ?>"></div>
+         data-name="<?= $currentUser->display_name ?>" data-role="<?= $currentUserRole ?>"></div>
     <div id="barbers" style="display:none;"
          data-barbers="<?= htmlspecialchars(json_encode($barbersFinal), ENT_QUOTES, 'UTF-8') ?>"></div>
-    <div class="barbers-toggler">
-        <div class="barber" @click="changeCurrentBarberView(-1)" :class="chosenBarber === -1 ? 'active' : ''">
-            <div class="img">
-                <?= svgIcon(icon_path(false) . "/icon-all_barbers.svg") ?>
-            </div>
-            <span>Všetci</span>
-        </div>
-        <?php foreach ($barbersFinal as $barber) : ?>
-            <div class="barber" @click="changeCurrentBarberView(<?= $barber['id'] ?>)"
-                 :class="chosenBarber === <?= $barber['id'] ?> ? 'active' : ''">
-                <div class="img">
-                    <?php if (!empty($barber['profileImage'])) : ?>
-                        <img src="<?= $barber['profileImage'] ?>" alt="Fotka">
-                    <?php else : ?>
-                        <?= svgIcon(icon_path(false) . "/icon-question_mark_admin.svg") ?>
-                    <?php endif ?>
+    <div class="header-wrapper mb-3 d-flex align-items-center justify-content-between flex-wrap">
+        <?php if ($currentUserRole !== "barber") : ?>
+            <div class="barbers-toggler">
+                <div class="barber" @click="changeCurrentBarberView(-1)"
+                     :class="chosenBarberOnView === -1 ? 'active' : ''">
+                    <div class="img">
+                        <?= svgIcon(icon_path(false) . "/icon-all_barbers.svg") ?>
+                    </div>
+                    <span>Všetci</span>
                 </div>
-                <span><?= $barber['name'] ?></span>
+                <?php foreach ($barbersFinal as $barber) : ?>
+                    <div class="barber" @click="changeCurrentBarberView(<?= $barber['id'] ?>)"
+                         :class="chosenBarberOnView === <?= $barber['id'] ?> ? 'active' : ''">
+                        <div class="img">
+                            <?php if (!empty($barber['profileImage'])) : ?>
+                                <img src="<?= $barber['profileImage'] ?>" alt="Fotka">
+                            <?php else : ?>
+                                <?= svgIcon(icon_path(false) . "/icon-question_mark_admin.svg") ?>
+                            <?php endif ?>
+                        </div>
+                        <span><?= $barber['name'] ?></span>
+                    </div>
+                <?php endforeach ?>
             </div>
-        <?php endforeach ?>
+        <?php else : ?>
+            <div></div>
+        <?php endif ?>
+        <div class="buttons-wrapper ml-auto d-flex align-items-center flex-wrap">
+            <button type="button" class="btn btn-primary" @click="createModal.show()">Pridať termín</button>
+        </div>
     </div>
     <div id="calendar"></div>
     <div class="modal fade" id="createAppointmentModal" tabindex="-1" aria-labelledby="createAppointmentModalLabel"
@@ -92,7 +101,15 @@ foreach ($barbers as $barber) {
                                 </select>
                             </div>
                         </div>
-                        <div class="part col-md-6 col-12" v-show="appointment.type === 'appointment'">
+                        <div class="part col-12" :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
+                            <div class="field-container mb-3">
+                                <label for="start" class="form-label">Začiatok</label>
+                                <input v-model="appointment.datetime.start" onfocus="this.showPicker()" step="1800"
+                                       type="datetime-local" class="form-control" id="start" name="start">
+                            </div>
+                        </div>
+                        <div class="part col-12" v-show="appointment.type === 'appointment'"
+                             :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
                             <div class="field-container mb-3">
                                 <label for="service">Služba</label>
                                 <select v-model="appointment.serviceID" class="form-control" id="service">
@@ -103,6 +120,13 @@ foreach ($barbers as $barber) {
                                         <?php endwhile ?>
                                         <?php wp_reset_query(); endif ?>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="part col-12" :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
+                            <div class="field-container mb-3">
+                                <label for="end" class="form-label">Koniec</label>
+                                <input v-model="appointment.datetime.end" onfocus="this.showPicker()" step="1800"
+                                       type="datetime-local" class="form-control" id="end" name="end">
                             </div>
                         </div>
                     </div>
@@ -150,7 +174,8 @@ foreach ($barbers as $barber) {
                         <label for="notify">Odoslať notifikáciu?</label>
                     </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušiť</button>
-                    <button type="button" class="btn btn-primary" @click="createAppointment()">Pridať</button>
+                    <button type="button" class="btn btn-primary" v-html="buttonLoader ? 'Pridávam...' : 'Pridať'"
+                            @click="createAppointment()"></button>
                 </div>
             </div>
         </div>
@@ -167,6 +192,15 @@ foreach ($barbers as $barber) {
                     <div class="row divided-row">
                         <div class="heading-part col-12">
                             <h3>Rezervácia</h3>
+                        </div>
+                        <div class="part col-12" v-show="chosenBarberOnView === -1"
+                             :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
+                            <div class="field-container mb-3">
+                                <label for="type">Barber</label>
+                                <select v-model="chosenBarberInForms" class="form-control" id="type">
+                                    <option v-for="barber in barbers" :value="barber.id" v-html="barber.name"></option>
+                                </select>
+                            </div>
                         </div>
                         <div class="part col-12" :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
                             <div class="field-container mb-3">
@@ -190,6 +224,20 @@ foreach ($barbers as $barber) {
                                 </select>
                             </div>
                         </div>
+                        <div class="part col-12" :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
+                            <div class="field-container mb-3">
+                                <label for="start" class="form-label">Začiatok</label>
+                                <input v-model="appointment.datetime.start" onfocus="this.showPicker()" step="1800"
+                                       type="datetime-local" class="form-control" id="start" name="start">
+                            </div>
+                        </div>
+                        <div class="part col-12" :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
+                            <div class="field-container mb-3">
+                                <label for="end" class="form-label">Koniec</label>
+                                <input v-model="appointment.datetime.end" onfocus="this.showPicker()" step="1800"
+                                       type="datetime-local" class="form-control" id="end" name="end">
+                            </div>
+                        </div>
                     </div>
                     <div class="row divided-row" v-if="appointment.type === 'appointment'">
                         <div class="heading-part col-12">
@@ -235,7 +283,9 @@ foreach ($barbers as $barber) {
                         <label for="notify">Odoslať notifikáciu?</label>
                     </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušiť</button>
-                    <button type="button" class="btn btn-primary" @click="editAppointment()">Upraviť</button>
+                    <button type="button" class="btn btn-primary btn-loader" v-html="buttonLoader ? 'Upravujem...' : 'Upraviť'"
+                            @click="editAppointment()">
+                    </button>
                 </div>
             </div>
         </div>
@@ -268,7 +318,9 @@ foreach ($barbers as $barber) {
                         <label for="notify">Odoslať notifikáciu?</label>
                     </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušiť</button>
-                    <button type="button" class="btn btn-danger" @click="removeAppointment()">Vymazať</button>
+                    <button type="button" class="btn btn-danger" v-html="buttonLoader ? 'Vymazávam...' : 'Vymazať'"
+                            @click="removeAppointment()">
+                    </button>
                 </div>
             </div>
         </div>

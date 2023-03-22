@@ -1,4 +1,5 @@
 <footer>
+    <div class="anchor" id="kontakt"></div>
     <div class="container">
         <div class="row">
             <div class="col-md-10 order-1 order-md-0 row links">

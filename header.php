@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="description" content="">
+    <meta name="description" content="Pánske holičstvo na bulvári v Žiline. Zarezervujte si termín tu. U nás si doprajete tú najlepšiu starostlivosť! Náš individuálny prístup ku každému jednému klientovi zaručí maximálne pohodlie a spokojnosť.">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"

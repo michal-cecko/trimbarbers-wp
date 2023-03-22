@@ -39,6 +39,7 @@ $services = new WP_query([
 ?>
 
 <section id="servicesSection">
+    <div class="anchor" id="sluzby"></div>
     <div class="container">
         <div class="text-container row">
             <div class="col-md-6">
@@ -89,6 +90,7 @@ if ($showIGFeed) $gallery = [];
 ?>
 
 <section id="instagramSection">
+    <div class="anchor" id="onas"></div>
     <div class="container">
         <div class="text-container">
             <div class="heading-container">

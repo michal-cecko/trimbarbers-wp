@@ -49,14 +49,16 @@ class Reservation extends Commons {
                     isModalVisible: false,
 
                     container: null,
-                    cards: {}
+                    contentContainer: null,
+                    cards: {},
                 },
                 created() {
                     console.log(`Reservation Vue component has been created.`)
                     this.defaultService()
                 },
                 mounted() {
-                    this.container = document.querySelector(".reservation-container")
+                    if(!this.container) this.container = document.querySelector(".reservation-container")
+                    if(!this.contentContainer) this.contentContainer = document.querySelector(".content-container")
                     let cards = this.container.querySelectorAll(".content")
 
                     if (this.container && cards.length) {
@@ -64,6 +66,10 @@ class Reservation extends Commons {
                             this.cards[i] = cards[i - 1];
                         }
                         this.changeHeight(1)
+                    }
+
+                    window.resize = function() {
+                        this.checkCustomStyle()
                     }
                 },
                 methods: {
@@ -96,12 +102,15 @@ class Reservation extends Commons {
                         if (!this.canContinue(nextStep)) return false;
 
                         this.step = nextStep
-                        this.isVisibleOrder = false
+                        if(nextStep !== 5) {
+                            this.isVisibleOrder = false
+                        }
 
                         if (nextStep === 3 && !returning) {
                             await this.loadDates()
                         }
 
+                        this.checkCustomStyle()
                         this.changeHeight(nextStep)
                     },
                     formatSelectedDatetime() {
@@ -204,9 +213,12 @@ class Reservation extends Commons {
                         return !this.errors.length;
 
                     },
+                    headerToggler() {
+                        if(this.step !== 5) this.isVisibleOrder = !this.isVisibleOrder
+                    },
+
                     async makeReservation() {
                         if (!this.sanitizeInputs()) {
-                            this.isVisibleOrder = false;
                             return false;
                         }
 
@@ -289,12 +301,19 @@ class Reservation extends Commons {
                         this.date = null
                         this.timeOptions = {}
                     },
-                    getCustomStyle() {
+                    checkCustomStyle() {
                         let val = ((this.step - 1) * 20.3);
+                        let style = "";
                         if (_thisClass.phoneMQ.matches) {
-                            val = ((this.step - 1) * 23.9);
+                            if(!this.container) this.container = document.querySelector(".reservation-container")
+                            let width = this.container.offsetWidth
+                            val = ((this.step - 1) * (width - 27.2));
+                            style = 'translateX(-' + val + 'px)'
+                        } else {
+                            style = 'translateX(-' + val + 'rem)'
                         }
-                        return 'transform: translateX(-' + val + 'rem)';
+                        this.contentContainer.style.transform = style;
+                        console.log(this.contentContainer.style.transform)
                     }
                 },
                 watch: {
@@ -320,7 +339,7 @@ class Reservation extends Commons {
                     'customer.phone'(newValue) {
                         this.sanitizePhone()
                     }
-                }
+                },
             }
         );
     }

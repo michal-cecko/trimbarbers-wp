@@ -1,7 +1,7 @@
 <?php
-$barbers = get_users([
-    'role' => 'barber',
-]);
+
+
+$barbers = getBarbers();
 
 $args = [
     'post_type' => 'service',
@@ -15,7 +15,9 @@ $services = new WP_Query($args);
 <div id="reservation">
     <div class="container">
         <div class="reservation-wrapper">
-            <button id="openReservationBtn" class="btn btn-primary btn-solid" :class="!isModalVisible ? 'active' : ''" @click="isModalVisible = true">Rezervácia</button>
+            <button id="openReservationBtn" class="btn btn-primary btn-solid" :class="!isModalVisible ? 'active' : ''"
+                    @click="isModalVisible = true">Rezervácia
+            </button>
             <div class="reservation-container" :class="isModalVisible ? 'active' : ''">
                 <div class="header" :class="step > 1 ? 'hasBackButton' : ''">
                     <div class="header-text">
@@ -34,7 +36,7 @@ $services = new WP_Query($args);
                         <?= svgIcon(icon_path(false) . "/icon-close.svg") ?>
                     </div>
                 </div>
-                <div class="content-container" :style="getCustomStyle()">
+                <div class="content-container">
                     <div class="content choose-barber">
                         <div class="barber" @click="chooseBarber(-1, 'Nezáleží', '')"
                              :class="barber.id === -1 ? 'chosen' : ''">
@@ -104,7 +106,7 @@ $services = new WP_Query($args);
                             <div v-if="Object.keys(timeOptions).length"
                                  v-for="(isAvailable, availableTime, index) in timeOptions"
                                  class="time-container"
-                                 :class="[availableTime === time ? 'chosen' : '', (isAvailable === '0' ? 'unavailable' : '')]"
+                                 :class="[availableTime === time ? 'chosen' : '', (isAvailable === 0 ? 'unavailable' : '')]"
                                  @click="chooseTime(availableTime)">
                                 <div class="time" :class="getTimeClass(availableTime)"
                                      v-html="moment('2022-03-21T'+availableTime+':00').format('H:mm')"></div>
@@ -128,7 +130,7 @@ $services = new WP_Query($args);
                             <div class="form-label">Poznámka</div>
                             <input type="text" v-model="customer.note">
                         </div>
-<!--                        <label for="saveCustomerToCookies" class="form-checkbox label-right">
+                        <!--                        <label for="saveCustomerToCookies" class="form-checkbox label-right">
                             <input type="checkbox" v-model="saveCustomerToCookies" id="saveCustomerToCookies">
                             <span class="checkbox">
                                 <?= svgIcon(icon_path(false) . "/icon-check.svg") ?>
@@ -139,9 +141,9 @@ $services = new WP_Query($args);
                 </div>
                 <div id="current-reservation"
                      :class="[(isVisibleOrder ? 'visible' : ''), (step === 5 ? 'bigger' : '')]">
-                    <div class="header" @click="isVisibleOrder = !isVisibleOrder">
+                    <div class="header" @click="headerToggler()">
                         <span class="header-text">Vaša rezervácia</span>
-                        <span class="toggle-button">
+                        <span class="toggle-button" :class="step !== 5 ? 'active' : ''">
                             <?= svgIcon(icon_path(false) . "/icon-arrow.svg") ?>
                         </span>
                     </div>
@@ -165,7 +167,7 @@ $services = new WP_Query($args);
                                  v-html="formatSelectedDatetime()"></div>
                         </div>
                     </div>
-                    <div class="contact-data" v-if="!errors.length && step === 5">
+                    <div class="contact-data" v-if="step === 5">
                         <div class="label" v-if="!hasError(customer.name)">Meno:</div>
                         <div class="value" v-if="!hasError(customer.name)" v-html="customer.name"></div>
                         <div class="label" v-if="!hasError(customer.email)">Email:</div>

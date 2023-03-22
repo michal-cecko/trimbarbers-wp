@@ -5,6 +5,7 @@ class General{
         this._prepareSwipers()
         this._prepareParametersRemoval()
         this._prepareNotifications()
+        this._prepareSmoothScrolling()
     }
 
     _prepareSwipers() {
@@ -72,6 +73,24 @@ class General{
                     console.log("removed")
                 }, x + (300 * i))
                 i++;
+            })
+        }
+    }
+
+
+    _prepareSmoothScrolling() {
+        let anchorlinks = document.querySelectorAll('a[href^="#"]')
+
+        for (let item of anchorlinks) {
+            item.addEventListener('click', (e)=> {
+                let hashval = item.getAttribute('href')
+                let target = document.querySelector(hashval)
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                })
+                history.pushState(null, null, hashval)
+                e.preventDefault()
             })
         }
     }

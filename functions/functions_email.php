@@ -10,7 +10,7 @@ function getEmailTemplate($emailType, $data)
 }
 
 
-function reservation_notification($to, $type, $id)
+function reservation_notification($to, $type, $id, $sendingToBarber = false)
 {
     $service = get_field("appointment_service", $id);
     $barber = get_field("appointment_barber", $id);
@@ -19,7 +19,8 @@ function reservation_notification($to, $type, $id)
     $message = getEmailTemplate($type, [
         'barber' => $barber,
         'service' => $service,
-        "id" => $id
+        "id" => $id,
+        "sendingToBarber" => $sendingToBarber
     ]);
 
     if ($type === "new") {

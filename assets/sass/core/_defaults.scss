@@ -3,6 +3,7 @@ html {
     font-family: $primaryFont;
     overflow-x: hidden;
     overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 a {
@@ -116,4 +117,11 @@ section{
     background-color: #bbb;
     border-radius: 20px;
     border: 3px solid #bbb;
+}
+
+.anchor{
+    width: 0;
+    height: 0;
+    visibility: hidden;
+    pointer-events: none;
 }

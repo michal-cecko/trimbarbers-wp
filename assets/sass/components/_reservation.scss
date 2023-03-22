@@ -1,7 +1,7 @@
 #reservation {
   position: fixed;
   right: 0;
-  bottom: 8vh;
+  bottom: 4vh;
   width: 100vw;
   z-index: 8;
   height: auto;
@@ -286,9 +286,8 @@
       }
 
       &.choose-date {
-        height: 100%;
         transition: all 0.3s ease;
-        min-height: 15rem;
+        height: fit-content;
 
         .empty-date-picker {
           display: flex;
@@ -316,6 +315,8 @@
         .date-picker {
           opacity: 0;
           pointer-events: none;
+          max-height: 60vh;
+          overflow-y: auto;
 
           &.shown {
             opacity: 1;
@@ -416,11 +417,17 @@
                 color: $primaryWhite;
               }
             }
+            &.unavailable{
+              pointer-events: none;
+              background: $quadraWhite !important;
+              opacity: 0.5;
+            }
           }
         }
       }
 
       &.choose-contact {
+        padding-bottom: 17.3rem;
         .form-input {
           margin-bottom: 1rem;
         }
@@ -456,6 +463,9 @@
         align-items: center;
         border-radius: 50%;
         background: $quadraWhite;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-1rem);
 
         svg {
           transform: rotate(90deg);
@@ -466,6 +476,12 @@
           path {
             fill: $tertiaryBlack;
           }
+        }
+
+        &.active{
+          transform: translateX(0);
+          opacity: 1;
+          pointer-events: none;
         }
       }
 
