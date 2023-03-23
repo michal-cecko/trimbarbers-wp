@@ -94,7 +94,7 @@ class General{
             })
         }
     }
-}
+ }
 
 new General()
 

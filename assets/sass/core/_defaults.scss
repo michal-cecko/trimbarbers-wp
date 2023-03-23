@@ -121,7 +121,21 @@ section{
 
 .anchor{
     width: 0;
-    height: 0;
     visibility: hidden;
     pointer-events: none;
+    display: block;
+    height: 5rem;
+    margin-top: -5rem;
+    &#sluzby{
+        height: 7rem;
+        margin-top: -7rem;
+    }
+    &#onas{
+        height: 8rem;
+        margin-top: -8rem;
+    }
+    &#kontakt{
+        height: 7rem;
+        margin-top: -7rem;
+    }
 }

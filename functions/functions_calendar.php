@@ -317,6 +317,7 @@ function get_appointments()
             ];
         }
     endwhile;
+    wp_reset_postdata();
 
     //Send JSON
     wp_send_json(["appointments" => $return], 200);

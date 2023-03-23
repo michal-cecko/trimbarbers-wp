@@ -312,8 +312,8 @@ foreach ($barbers as $barber) {
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <div class="field-container me-auto" v-if="appointment.type === 'appointment'">
+                <div class="modal-footer" v-if="appointmentToDelete">
+                    <div class="field-container me-auto" v-if="appointmentToDelete.extendedProps.type === 'appointment'">
                         <input v-model="notify" type="checkbox" class="form-control" id="notify" name="notify">
                         <label for="notify">Odoslať notifikáciu?</label>
                     </div>

@@ -12,7 +12,7 @@ $services = new WP_Query($args);
 
 ?>
 
-<div id="reservation">
+<div id="reservation" :class="isModalVisible ? 'active' : ''">
     <div class="container">
         <div class="reservation-wrapper">
             <button id="openReservationBtn" class="btn btn-primary btn-solid" :class="!isModalVisible ? 'active' : ''"
@@ -75,7 +75,7 @@ $services = new WP_Query($args);
                                     <div class="duration"><?= $duration ?>min</div>
                                     <div class="price"><?= $price ?>€</div>
                                 </div>
-                            <?php endwhile ?>
+                            <?php endwhile; wp_reset_postdata(); ?>
                         <?php endif ?>
                     </div>
                     <div class="content choose-date position-relative">
@@ -174,8 +174,6 @@ $services = new WP_Query($args);
                         <div class="value" v-if="!hasError(customer.email)" v-html="customer.email"></div>
                         <div class="label" v-if="!hasError(customer.phone)">Telefón:</div>
                         <div class="value" v-if="!hasError(customer.phone)" v-html="customer.phone"></div>
-                        <div class="label" v-if="customer.note.trim().length">Poznámka:</div>
-                        <div class="value" v-if="customer.note.trim().length" v-html="customer.note"></div>
                     </div>
                     <div class="button-container">
                         <button class="btn btn-primary btn-no-scale btn-solid next-step"

@@ -18,3 +18,5 @@
     include "functions/functions_userroles.php";
 
     include "functions/functions_plugins.php";
+
+    include "functions/functions_rest.php";

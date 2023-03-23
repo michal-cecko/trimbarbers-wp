@@ -219,6 +219,7 @@ $activeColor: #b1bb5b;
   .modal-dialog {
     max-width: 800px !important;
     margin-top: 4rem;
+    z-index: 1000;
 
     .modal-content {
       p {
@@ -286,5 +287,11 @@ $activeColor: #b1bb5b;
         }
       }
     }
+  }
+}
+
+.modal-backdrop{
+  @media screen and (max-width: 768px) {
+    display: none;
   }
 }

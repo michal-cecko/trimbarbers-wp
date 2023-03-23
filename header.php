@@ -48,13 +48,13 @@
         <div class="container">
             <ul class="navigation d-md-none d-flex">
                 <li class="nav-part">
-                    <a class="nav-link" href="#sluzby">Služby</a>
+                    <a class="nav-link" href="#sluzby" @click="isOpened = false">Služby</a>
                 </li>
                 <li class="nav-part">
-                    <a class="nav-link" href="#onas">O nás</a>
+                    <a class="nav-link" href="#onas" @click="isOpened = false">O nás</a>
                 </li>
                 <li class="nav-part">
-                    <a class="nav-link" href="#kontakt">Kontakt</a>
+                    <a class="nav-link" href="#kontakt" @click="isOpened = false">Kontakt</a>
                 </li>
             </ul>
         </div>
