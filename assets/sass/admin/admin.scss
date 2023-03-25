@@ -1,0 +1,46 @@
+.searchable-select{
+  position: relative;
+  width: 100%;
+  .searchbar{
+    width: 100%;
+  }
+  .options{
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    border-radius: 3px;
+    border: 1px solid #8c8f94;
+    display: none;
+    max-height: 10rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: white;
+    .option,
+    .nothing{
+      font-size: 0.9rem;
+      padding: 0 8px;
+      min-height: 30px;
+      line-height: 2;
+      background: white;
+      border-bottom: 1px solid #8c8f94;
+      transition: all 0.15s ease;
+      &:last-child{
+        border-bottom: 0;
+      }
+    }
+    .option{
+      @media(hover: hover) {
+        &:hover{
+          background: #f1f1f1;
+        }
+      }
+    }
+  }
+
+  &.show{
+    .options{
+      display: block;
+    }
+  }
+}

@@ -83,9 +83,10 @@ $services = new WP_Query($args);
                             <div v-for="(dates, month, index) in availableDates" class="dates-container">
                                 <h3 class="month-name" v-html="getMonthName(month)"></h3>
                                 <div class="date-grid">
-                                    <div v-for="(isAvailable, availableDate, index) in dates" class="date"
-                                         :class="availableDate === date ? 'chosen' : ''"
+                                    <div v-for="(x, availableDate, index) in dates" class="date"
+                                         :class="[availableDate === date ? 'chosen' : '', isWeekend(availableDate) ? 'weekend' : '']"
                                          @click="chooseDate(availableDate)">
+                                        <div></div>
                                         <div class="number" v-html="moment(availableDate).format('D')"></div>
                                         <div class="name" v-html="getDayName(moment(availableDate).format('d'))"></div>
                                     </div>

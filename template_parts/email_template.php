@@ -208,7 +208,7 @@
                         <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                         <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
                     <?php else : ?>
-                        Dobrý deň, ďakujeme za Vašu rezervíciu a tešíme sa na Vašu návštevu.<br><br>
+                        Dobrý deň, ďakujeme za Vašu rezerváciu a tešíme sa na Vašu návštevu.<br><br>
                         <b>DETAILY VAŠEJ REZERVÁCIE</b><br>
                         <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                         <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>

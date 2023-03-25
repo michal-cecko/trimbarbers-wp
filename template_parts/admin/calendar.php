@@ -92,6 +92,15 @@ foreach ($barbers as $barber) {
                         <div class="heading-part col-12">
                             <h3>Rezervácia</h3>
                         </div>
+                        <div class="part col-12" v-show="chosenBarberOnView === -1 || loggedInBarber.role === 'administrator'"
+                             :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
+                            <div class="field-container mb-3">
+                                <label for="type">Barber</label>
+                                <select v-model="chosenBarberInForms" class="form-control" id="type">
+                                    <option v-for="barber in barbers" :value="barber.id" v-html="barber.name"></option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="part col-12" :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
                             <div class="field-container mb-3">
                                 <label for="type">Typ</label>
@@ -133,6 +142,18 @@ foreach ($barbers as $barber) {
                     <div class="row divided-row" v-if="appointment.type === 'appointment'">
                         <div class="heading-part col-12">
                             <h3>Zákazník</h3>
+                        </div>
+                        <div class="part col-12">
+                            <div class="field-container mb-3">
+                                <label for="name" class="form-label">Vybrať z databázy</label>
+                                <div class="searchable-select" :class="shownOptions ? 'show' : ''" v-click-outside="hideOptions">
+                                    <input type="text" class="searchbar" v-model="customerSearchQuery" @input="debouncedFetchCustomers" @click="shownOptions = true">
+                                    <div class="options">
+                                        <div class="option" v-if="Object.keys(customers).length > 0" v-for="customer in customers" @click="chooseCustomer(customer)" v-html="formatCustomerOption(customer)"></div>
+                                        <div class="nothing" v-if="Object.keys(customers).length === 0" v-html="'Žiadne výsledky.'"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="part col-md-4 col-12">
                             <div class="field-container mb-3">
@@ -193,7 +214,7 @@ foreach ($barbers as $barber) {
                         <div class="heading-part col-12">
                             <h3>Rezervácia</h3>
                         </div>
-                        <div class="part col-12" v-show="chosenBarberOnView === -1"
+                        <div class="part col-12" v-show="chosenBarberOnView === -1 || loggedInBarber.role === 'administrator'"
                              :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
                             <div class="field-container mb-3">
                                 <label for="type">Barber</label>
@@ -283,7 +304,8 @@ foreach ($barbers as $barber) {
                         <label for="notify">Odoslať notifikáciu?</label>
                     </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušiť</button>
-                    <button type="button" class="btn btn-primary btn-loader" v-html="buttonLoader ? 'Upravujem...' : 'Upraviť'"
+                    <button type="button" class="btn btn-primary btn-loader"
+                            v-html="buttonLoader ? 'Upravujem...' : 'Upraviť'"
                             @click="editAppointment()">
                     </button>
                 </div>
@@ -313,7 +335,8 @@ foreach ($barbers as $barber) {
                     </div>
                 </div>
                 <div class="modal-footer" v-if="appointmentToDelete">
-                    <div class="field-container me-auto" v-if="appointmentToDelete.extendedProps.type === 'appointment'">
+                    <div class="field-container me-auto"
+                         v-if="appointmentToDelete.extendedProps.type === 'appointment'">
                         <input v-model="notify" type="checkbox" class="form-control" id="notify" name="notify">
                         <label for="notify">Odoslať notifikáciu?</label>
                     </div>

@@ -181,6 +181,9 @@ class Reservation extends Commons {
                         }
                         return true;
                     },
+                    isWeekend(date) {
+                        return moment(date).day() === 6 || moment(date).day() === 0
+                    },
                     sanitizePhone() {
                         let removeExisting = this.errors.indexOf("phone");
                         if (removeExisting !== -1) {

@@ -47,28 +47,28 @@ function get_available_dates()
             [
                 'key' => 'appointment_datetime_from',
                 'value' => date("Y-m-d") . " 00:00:00",
-                'compare' => '<=',
+                'compare' => '>=',
                 'type' => 'DATETIME',
             ],
             [
                 'key' => 'appointment_datetime_to',
                 'value' => date("Y-m-d") . " 00:00:00",
-                'compare' => '<=',
+                'compare' => '>=',
                 'type' => 'DATETIME',
             ]
         ];
-        /*$args['meta_query'] = [
+
+        $args['meta_query'] = [
             'relation' => 'AND',
             [
                 'key' => 'appointment_barber',
-                'value' => $barber->ID,
+                'value' => intval($barberID),
                 'compare' => '='
             ],
             $dateCond,
         ];
-        var_dump($args);*/
+
         $reservations = new WP_Query($args);
-        //var_dump(count($reservations->get_posts()));
 
         $obsadeneArr = [];
         if ($reservations->have_posts()) :
@@ -85,14 +85,15 @@ function get_available_dates()
 
         //var_dump($obsadeneArr);
 
-
-
         for ($i = 0; $i < 60; $i++) :
             $date = $currentDate->modify("+1 day");
-            if (in_array($date->format("N"), [6, 7])) continue;
+            $dateFormat = $currentDate->format("Y-m-d");
+            if (in_array($date->format("N"), [6, 7])) {
+                $finalDates[$currentDate->format("n")][$dateFormat] = [];
+                continue;
+            };
             $currentDate = $date;
             //echo "currentDate: " . $date->format("d.m.Y") . "<br>";
-            $dateFormat = $currentDate->format("Y-m-d");
             $obsadene = $obsadeneArr[$dateFormat] ?? false;
 
             //work start is currentTime
@@ -127,8 +128,6 @@ function get_available_dates()
                         $terminStart = $time['start'];
                         $terminEnd = $time['end'];
 
-                        //$canStart = $currentStart <= $terminEnd;
-                        //echo "$currentStart <= $terminEnd <br>";
                         $canEnd = $currentEnd <= $terminStart || $currentStart >= $terminEnd;
                         //echo "$currentEnd <= $terminStart " . " || " . " $currentStart >= $terminEnd <br>";
 

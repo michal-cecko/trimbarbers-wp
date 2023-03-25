@@ -97,13 +97,13 @@ function update_appointment_fields($data, $barber, $post_id, $type)
 
     // Must-update fields: Type
     update_field('appointment_type', $type, $post_id);
-    if($barber > 0) update_field('appointment_barber', $barber, $post_id);
+    if ($barber > 0) update_field('appointment_barber', $barber, $post_id);
 
     if ($type == "appointment") {
         //Service
         update_field('appointment_service', $data['serviceID'], $post_id);
 
-        if($barber < 1 || $barber === "-1") {
+        if ($barber < 1 || $barber === "-1") {
             $barbers = getBarbers(true);
             $args = [
                 'post_type' => 'appointment',
@@ -144,11 +144,11 @@ function update_appointment_fields($data, $barber, $post_id, $type)
                 ]
             ];
             $reservations = new WP_Query($args);
-            if($reservations->have_posts()) {
-                while($reservations->have_posts()){
+            if ($reservations->have_posts()) {
+                while ($reservations->have_posts()) {
                     $reservations->the_post();
                     $key = array_search(get_field("appointment_barber"), $barbers);
-                    if($key) unset($key);
+                    if ($key) unset($key);
                 }
                 $barbers = array_values($barbers);
                 wp_reset_postdata();
@@ -157,8 +157,50 @@ function update_appointment_fields($data, $barber, $post_id, $type)
             update_field('appointment_barber', $barber, $post_id);
         }
 
+
+        $args = [
+            'post_type' => 'customer',
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'meta_query' => [
+                "relation" => "AND",
+                [
+                    'key' => 'cust-email',
+                    'value' => $data['customer']['email'],
+                    'compare' => '=',
+                ]
+            ],
+        ];
+
+        $q = new WP_Query($args);
+
+        if ($q->have_posts()) {
+            $q->the_post();
+            $customerID = get_the_ID();
+            wp_reset_postdata();
+        }
+
+        if (!isset($customerID)) {
+            $args = [
+                'post_status' => 'publish',
+                'post_type' => 'customer',
+            ];
+            $customerID = wp_insert_post($args);
+            update_field('cust-name', $data['customer']['name'], $customerID);
+            update_field('cust-email', $data['customer']['email'], $customerID);
+            if (!empty($data['customer']['phone']))
+                update_field('cust-phone', $data['customer']['phone'], $customerID);
+        }
+
+        $lastAppointment = get_field('cust-last_appointment', $customerID);
+        if(strtotime($lastAppointment) < $datetimeFrom->getTimestamp()) {
+            update_field('cust-last_appointment', $datetimeFrom->format("Y-m-d H:i"), $customerID);
+        }
+
+
         //Customer
         update_field('appointment_customer', [
+            'id' => $customerID,
             'name' => $data['customer']['name'],
             'email' => $data['customer']['email'],
             'phone' => $data['customer']['phone'],
@@ -321,4 +363,62 @@ function get_appointments()
 
     //Send JSON
     wp_send_json(["appointments" => $return], 200);
+}
+
+
+add_action('wp_ajax_get_customers', 'get_customers');
+add_action('wp_ajax_nopriv_get_customers', 'get_customers');
+
+function get_customers()
+{
+    $search = $_GET['search'] ?? false;
+    if (empty($search)) {
+        wp_send_json([
+            'message' => "Nebol zadaný search."
+        ], 403);
+    }
+
+    $args = [
+        'post_type' => 'customer',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'meta_query' => [
+            "relation" => 'OR',
+            [
+                'key' => 'cust-name',
+                'value' => $search,
+                'compare' => 'LIKE',
+            ],
+            [
+                'key' => 'cust-phone',
+                'value' => $search,
+                'compare' => 'LIKE',
+            ],
+            [
+                'key' => 'cust-email',
+                'value' => $search,
+                'compare' => 'LIKE',
+            ],
+        ],
+    ];
+
+    $q = new WP_Query($args);
+
+    $finalPosts = [];
+
+    if ($q->have_posts()) {
+        while ($q->have_posts()) {
+            $q->the_post();
+            $finalPosts[] = [
+                'id' => get_the_ID(),
+                'name' => get_field("cust-name"),
+                'email' => get_field("cust-email"),
+                'phone' => get_field("cust-phone"),
+            ];
+        }
+    }
+
+    wp_send_json([
+        'data' => $finalPosts
+    ], 200);
 }

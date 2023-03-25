@@ -20,6 +20,21 @@ class ReservationCalendar extends Commons {
     init() {
         let _Vue = Vue
         let _thisClass = this
+
+        Vue.directive('click-outside', {
+            bind: function (el, binding, vnode) {
+                el.clickOutsideEvent = function (event) {
+                    if (!(el == event.target || el.contains(event.target))) {
+                        vnode.context[binding.expression](event);
+                    }
+                };
+                document.body.addEventListener('click', el.clickOutsideEvent);
+            },
+            unbind: function (el) {
+                document.body.removeEventListener('click', el.clickOutsideEvent);
+            }
+        });
+
         new _Vue({
             el: '#calendarContainer',
             data: {
@@ -38,7 +53,7 @@ class ReservationCalendar extends Commons {
                 deleteModal: null,
                 appointmentToDelete: null,
 
-                loggedInBarber: null,
+                loggedInBarber: {},
                 chosenBarberOnView: null,
                 chosenBarberInForms: null,
                 barbers: null,
@@ -46,6 +61,10 @@ class ReservationCalendar extends Commons {
                 buttonLoader: false,
 
                 dateRange: {start: null, end: null},
+                customers: {},
+                customerSearchQuery: "",
+                shownOptions: false,
+                debounceTimer: null,
 
                 notify: false,
 
@@ -81,6 +100,18 @@ class ReservationCalendar extends Commons {
                 this.initCalendar()
             },
             methods: {
+                hideOptions() {
+                    this.shownOptions = false
+                },
+
+                getResources() {
+                    let toReturn = [];
+                    this.barbers.forEach(barber => {
+                        toReturn.push({id: barber.id, title: barber.name})
+                    })
+                    return toReturn
+                },
+
                 async initCalendar() {
                     let _thisVue = this
 
@@ -91,17 +122,17 @@ class ReservationCalendar extends Commons {
                     let calendar = new Calendar(calendarEl, {
                         plugins: [timeGridPlugin, dayGridPlugin, interactionPlugin],
                         locale: skLocale,
-
                         nowIndicator: true,
                         select: function (info) {
                             // Show the modal
+                            _thisVue.resetModals()
                             _thisVue.appointment.datetime = {
                                 start: moment(info.start).format("YYYY-MM-DD HH:mm:ss"),
                                 end: moment(info.end).format("YYYY-MM-DD HH:mm:ss"),
                             }
                             _thisVue.createModal.show();
                         },
-                        longPressDelay: 1,
+                        longPressDelay: 1000,
                         editable: false,
                         selectable: true,
                         selectOverlap: true,
@@ -145,6 +176,7 @@ class ReservationCalendar extends Commons {
                         eventDidMount: function (info) {
                             let html = '<span class="delete-button">&times;</span>';
                             let eventEl = info.el;
+
                             let deleteButtonEl = eventEl.querySelector('.delete-button');
                             if (!deleteButtonEl) {
                                 eventEl.insertAdjacentHTML('beforeend', html);
@@ -157,6 +189,7 @@ class ReservationCalendar extends Commons {
                                 });
                             }
                         },
+
                         eventContent: function (info) {
                             let event = info.event;
                             let view = info.view.type;
@@ -278,8 +311,7 @@ class ReservationCalendar extends Commons {
                         this.buttonLoader = false;
 
                         this.createModal.hide();
-                        this.notify = false;
-
+                        this.resetModals()
 
                         return true;
                     } catch (error) {
@@ -301,12 +333,9 @@ class ReservationCalendar extends Commons {
                     data.append("action", "edit_appointment")
                     data.append("nonce", _thisClass.nonce)
 
-                    console.log(this.appointment.datetime.start)
-
                     try {
                         this.buttonLoader = true;
                         let response = await _thisClass.WPPostAjax(data);
-                        console.log(response)
                         let responseData = await response.json();
 
                         this.editingAppointment.remove();
@@ -332,7 +361,7 @@ class ReservationCalendar extends Commons {
 
                         this.buttonLoader = false;
                         this.editModal.hide();
-                        this.notify = false;
+                        this.resetModals()
 
                         return true;
                     } catch (error) {
@@ -408,6 +437,52 @@ class ReservationCalendar extends Commons {
                         });
                 },
 
+                debouncedFetchCustomers() {
+                    clearTimeout(this.debounceTimer);
+                    this.debounceTimer = setTimeout(() => {
+                        this.fetchCustomers()
+                    }, 500);
+                },
+
+                fetchCustomers() {
+                    const searchTerm = this.customerSearchQuery;
+                    if (!searchTerm) {
+                        this.customers = {};
+                        return;
+                    }
+                    let params = {
+                        search: searchTerm,
+                        action: "get_customers",
+                        nonce: _thisClass.nonce,
+                    };
+                    return fetch(_thisClass.addParamsToUrl(params, _thisClass.ajaxURL))
+                        .then(response => response.json())
+                        .then(response => {
+                            this.customers = response.data;
+                        })
+                },
+
+                chooseCustomer(customer) {
+                    console.log("chosen")
+                    this.shownOptions = false
+                    this.customerSearchQuery = customer.name
+                    this.appointment.customer.id = customer.id
+                    this.appointment.customer.name = customer.name
+                    this.appointment.customer.email = customer.email
+                    this.appointment.customer.phone = customer.phone
+                },
+
+                formatCustomerOption(customer) {
+                    let toReturn = "<b>" + customer.name + "</b>";
+                    if (customer.email) {
+                        toReturn += " | <span>" + customer.email + "</span>";
+                    }
+                    if (customer.phone) {
+                        toReturn += " | <span>" + customer.phone + "</span>";
+                    }
+                    return toReturn
+                },
+
                 async changeCurrentBarberView(id) {
                     this.chosenBarberOnView = this.chosenBarberInForms = id
 
@@ -453,9 +528,17 @@ class ReservationCalendar extends Commons {
                     this.appointment = {
                         customer: {},
                         datetime: {},
-                        type: "free",
+                        type: "appointment",
                         serviceID: "",
                     }
+                },
+
+                resetModals() {
+                    this.resetAppointmentVariable()
+                    this.resetAppointmentToDeleteVariable()
+                    this.customerSearchQuery = ""
+                    this.customers = {}
+                    this.notify = false;
                 },
 
                 resetAppointmentToDeleteVariable() {
@@ -473,8 +556,12 @@ class ReservationCalendar extends Commons {
                         this.appointment.datetime.end = moment(start, 'YYYY-MM-DD HH:mm:ss').add(parseInt(this.serviceDurations[newID]), "minutes").format("YYYY-MM-DD HH:mm:ss")
                     }
                 },
-                'appointment.datetime'(newDatetime) {
-                    console.log(newDatetime)
+                'appointment.datetime.start'(newStart) {
+                    let start = this.appointment.datetime.start
+                    let serviceID = this.appointment.serviceID
+                    if (serviceID && start && this.appointment.type === "appointment") {
+                        this.appointment.datetime.end = moment(start, 'YYYY-MM-DD HH:mm:ss').add(parseInt(this.serviceDurations[serviceID]), "minutes").format("YYYY-MM-DD HH:mm:ss")
+                    }
                 },
             }
         });

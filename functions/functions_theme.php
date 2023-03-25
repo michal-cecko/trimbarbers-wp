@@ -1,5 +1,5 @@
 <?php
-$version = wp_get_theme()->parent()->Version ?? "1.2.0";
+$version = wp_get_theme()->parent()->Version ?? "1.3.0";
 DEFINE("VERSION", WP_DEBUG ? time() : $version);
 
 // THEME SETUP
