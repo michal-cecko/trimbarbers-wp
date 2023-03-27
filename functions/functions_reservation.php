@@ -31,8 +31,8 @@ function get_available_dates()
         } else {
             $barber = $barbers[$b];
         }
-        //echo "barberID: " . $barber->ID . "<br>";
-        //echo "barber: " . ($barber->first_name) . "<br>";
+        // "barberID: " . $barber->ID . "<br>";
+        // "barber: " . ($barber->first_name) . "<br>";
 
         $worktime = get_field("worktime", "user_" . $barber->ID);
         $lunchtime = get_field("lunchtime", "user_" . $barber->ID);
@@ -62,7 +62,7 @@ function get_available_dates()
             'relation' => 'AND',
             [
                 'key' => 'appointment_barber',
-                'value' => intval($barberID),
+                'value' => $barber->ID,
                 'compare' => '='
             ],
             $dateCond,
@@ -105,10 +105,7 @@ function get_available_dates()
 
             //echo "Work from: " . $worktime['start'] . " to " . $worktime['end'] . "<br>";
             //echo "Lunch from: " . $lunchStart . " to " . $lunchEnd . "<br>";
-            //var_dump($obsadene);
-            //echo "<br>";
 
-            //echo "while: " . $currentTime->format("H:i") . " <= " . $workEndWhile;
             while ($currentTime->format("H:i") < $workEndWhile) :
                 $currentTime = $currentTime->modify("+30 minutes");
                 $currentStart = $currentTime->format("H:i");
@@ -137,16 +134,21 @@ function get_available_dates()
                         }
                     }
                 }
+
                 if ($ok) {
-                    //echo "is ok<br>";
-                    $finalDates[$currentDate->format("n")][$dateFormat][$currentStart] = 1;
-                } else if (!isset($finalDates[$currentDate->format("n")][$dateFormat][$currentStart])) {
-                    //echo "is NOT really ok<br>";
-                    $finalDates[$currentDate->format("n")][$dateFormat][$currentStart] = 0;
-                } else {
-                    //echo "is NOT ok<br>";
+                    $finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart] = 1;
+                } else if (!isset($finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart])) {
+                    $finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart] = 0;
+                }
+
+                if($finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'] != 1 && $ok) {
+                    $finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'] = 1;
                 }
             endwhile;
+
+            if(!isset($finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'])) {
+                $finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'] = 0;
+            }
         endfor;
 
         $b++;

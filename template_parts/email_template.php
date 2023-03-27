@@ -207,6 +207,7 @@
                         <b>DETAILY REZERVÁCIE</b><br>
                         <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                         <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
+                        <b>Barber</b>: <?= $barber->first_name ?><br>
                     <?php else : ?>
                         Dobrý deň, ďakujeme za Vašu rezerváciu a tešíme sa na Vašu návštevu.<br><br>
                         <b>DETAILY VAŠEJ REZERVÁCIE</b><br>
@@ -264,6 +265,7 @@
                         Zákazník zrušil rezerváciu nasledovného termínu:<br><br>
                         <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                         <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
+                        <b>Barber</b>: <?= $barber->first_name ?><br>
                     <?php else : ?>
                         Dobrý deň, je nám to ľúto, ale Vaša rezervácia bola zrušená.<br><br>
                         <b>DETAILY VAŠEJ REZERVÁCIE</b><br>

@@ -57,8 +57,8 @@ class Reservation extends Commons {
                     this.defaultService()
                 },
                 mounted() {
-                    if(!this.container) this.container = document.querySelector(".reservation-container")
-                    if(!this.contentContainer) this.contentContainer = document.querySelector(".content-container")
+                    if (!this.container) this.container = document.querySelector(".reservation-container")
+                    if (!this.contentContainer) this.contentContainer = document.querySelector(".content-container")
                     let cards = this.container.querySelectorAll(".content")
 
                     if (this.container && cards.length) {
@@ -68,7 +68,7 @@ class Reservation extends Commons {
                         this.changeHeight(1)
                     }
 
-                    window.resize = function() {
+                    window.resize = function () {
                         this.checkCustomStyle()
                     }
                 },
@@ -92,7 +92,7 @@ class Reservation extends Commons {
                     chooseDate(date) {
                         this.isVisibleOrder = true
                         this.date = date
-                        this.timeOptions = this.availableDates[moment(date).format("M")][date]
+                        this.timeOptions = this.availableDates[moment(date).format("M")][date]['apps']
                     },
                     chooseTime(time) {
                         this.isVisibleOrder = true
@@ -102,7 +102,7 @@ class Reservation extends Commons {
                         if (!this.canContinue(nextStep)) return false;
 
                         this.step = nextStep
-                        if(nextStep !== 5) {
+                        if (nextStep !== 5) {
                             this.isVisibleOrder = false
                         }
 
@@ -217,7 +217,7 @@ class Reservation extends Commons {
 
                     },
                     headerToggler() {
-                        if(this.step !== 5) this.isVisibleOrder = !this.isVisibleOrder
+                        if (this.step !== 5) this.isVisibleOrder = !this.isVisibleOrder
                     },
 
                     async makeReservation() {
@@ -308,7 +308,7 @@ class Reservation extends Commons {
                         let val = ((this.step - 1) * 20.3);
                         let style = "";
                         if (_thisClass.phoneMQ.matches) {
-                            if(!this.container) this.container = document.querySelector(".reservation-container")
+                            if (!this.container) this.container = document.querySelector(".reservation-container")
                             let width = this.container.offsetWidth
                             val = ((this.step - 1) * (width - 27.2));
                             style = 'translateX(-' + val + 'px)'
