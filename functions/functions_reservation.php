@@ -204,7 +204,7 @@ function make_reservation()
     ];
     $postID = wp_insert_post($args);
 
-    $cancelToken = getRandomString(12);
+    $cancelToken = getRandomString(24);
     update_post_meta($postID, "cancel_token", $cancelToken);
 
     update_appointment_fields([

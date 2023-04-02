@@ -229,7 +229,7 @@ function cancel_appointment($id, $notify = false)
     $type = get_field("appointment_type", $id);
     if ($type !== "free" && $notify) {
         $receiver = get_field('appointment_customer_email', $id);
-        if (!empty($receiver)) reservation_notification($receiver, "cancel", $id);
+        if (!empty($receiver)) reservation_notification($receiver, "cancel-admin", $id);
     }
     return wp_delete_post($id, true);
 }
