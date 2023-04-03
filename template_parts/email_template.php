@@ -266,6 +266,15 @@
                         <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                         <b>Služba</b>: <?= $serviceTitle . " (" . $servicePrice. "€)" ?><br>
                         <b>Barber</b>: <?= $barber->first_name ?><br>
+                        <br>
+
+                        <b>KONTAKTNÉ ÚDAJE</b><br>
+                        <b>Meno a priezvisko</b>: <?= $customer['name'] ?><br>
+                        <b>Telefón</b>: <?= $customer['phone'] ?><br>
+                        <b>Email</b>: <?= $customer['email'] ?><br>
+
+                        <br>
+
                         <?php if ($type === "cancel-customer") : ?>
                             <b>Zrušil</b>: Zákazník<br>
                         <?php else : ?>

@@ -37,10 +37,7 @@ function cancel_reservation_handler($request)
     $token = $request->get_param('t');
     $id = $request->get_param('i');
     if (get_post_meta($id, "cancel_token", true) === $token) {
-        cancel_appointment($id, true);
-        if($reservationsEmail = get_field("reservations_email", "options")) {
-            reservation_notification($reservationsEmail, "cancel-customer", $id);
-        }
+        cancel_appointment($id, "customer", true);
     }
     wp_redirect(home_url(). "?c=1");
     exit();

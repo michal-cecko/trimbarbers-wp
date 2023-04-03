@@ -220,16 +220,18 @@ function remove_appointment()
     $id = $_POST['id'] ?? false;
     checkAppointment($id);
     $notify = isset($_POST['notify']) && $_POST['notify'] !== "false";
-    cancel_appointment($id, $notify);
+    cancel_appointment($id, 'admin', $notify);
     wp_send_json([], 200);
 }
 
-function cancel_appointment($id, $notify = false)
-{
+function cancel_appointment($id, $cancelType = 'admin', $notify = false) {
     $type = get_field("appointment_type", $id);
     if ($type !== "free" && $notify) {
         $receiver = get_field('appointment_customer_email', $id);
-        if (!empty($receiver)) reservation_notification($receiver, "cancel-admin", $id);
+        if (!empty($receiver)) reservation_notification($receiver, "cancel-$cancelType", $id);
+        if($reservationsEmail = get_field("reservations_email", "options")) {
+            reservation_notification($reservationsEmail, "cancel-$cancelType", $id, true);
+        }
     }
     return wp_delete_post($id, true);
 }
