@@ -1,6 +1,7 @@
 <?php
-$version = wp_get_theme()->parent()->Version ?? "1.4.0";
-DEFINE("VERSION", WP_DEBUG ? time() : $version);
+const WP_VERSIONING = TRUE;
+$version = wp_get_theme()->get("Version") ?? "1.0.0";
+DEFINE("VERSION", !WP_VERSIONING ? time() : $version);
 
 // THEME SETUP
 
@@ -193,7 +194,7 @@ function enqueue_custom_scripts_links(): void
     //Remove global inline styles
     wp_dequeue_style('global-styles');
 
-    if (WP_DEBUG) {
+    if (!WP_VERSIONING) {
         $mainCSSPath = get_template_directory_uri() . '/dist/css/main.css';
     } else {
         $mainCSSPath = get_template_directory_uri() . '/dist/css/main.min.css';

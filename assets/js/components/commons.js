@@ -71,6 +71,12 @@ export default class Commons {
         return "December";
     }
 
+    empty(variable) {
+        return ([undefined, null, false, 0, "[]", "", "null", "0000-00-00"].includes(variable)) ||
+            (Array.isArray(variable) && !variable.length) ||
+            (!Array.isArray(variable) && typeof variable === "object" && !Object.keys(variable).length)
+    }
+
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }

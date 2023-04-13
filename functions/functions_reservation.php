@@ -135,10 +135,25 @@ function get_available_dates()
                     }
                 }
 
+                $timeToAdd = [];
+                $termin = $finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart] ?? [];
+
+                // termin is available
                 if ($ok) {
-                    $finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart] = 1;
-                } else if (!isset($finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart])) {
-                    $finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart] = 0;
+                    $timeToAdd['isAvailable'] = 1;
+                    $timeToAdd['barbers'] = [$barber->ID];
+                }
+                // termin is not available && is not set
+                else if (empty($termin)) {
+                    $timeToAdd['isAvailable'] = 0;
+                    $timeToAdd['barbers'] = [];
+                }
+
+                if(!empty($timeToAdd)) {
+                    if(!empty($termin) && !empty($termin['barbers'])) {
+                        $timeToAdd['barbers'] = array_merge($timeToAdd['barbers'], $termin['barbers']);
+                    }
+                    $finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart] = $timeToAdd;
                 }
 
                 if($finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'] != 1 && $ok) {
@@ -165,10 +180,10 @@ add_action('wp_ajax_nopriv_make_reservation', 'make_reservation');
 
 function make_reservation()
 {
-    $barberID = $_POST['barber'] ?? false;
-    if (!$barberID) {
+    $barbers = isset($_POST['barbers']) ? js_json_decode($_POST['barbers']) : false;
+    if (empty($barbers)) {
         wp_send_json([
-            'message' => "ID Barbera nebolo nastavené."
+            'message' => "Nebol vybraný barber."
         ], 403);
     }
 
@@ -206,6 +221,10 @@ function make_reservation()
 
     $cancelToken = getRandomString(24);
     update_post_meta($postID, "cancel_token", $cancelToken);
+
+    //Pick one barber
+    $barbers = array_values($barbers);
+    $barberID = $barbers[array_rand($barbers)];
 
     update_appointment_fields([
         'customer' => $customer,

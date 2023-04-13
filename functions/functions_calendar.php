@@ -95,69 +95,16 @@ function update_appointment_fields($data, $barber, $post_id, $type)
         'to' => $datetimeTo->format('Y-m-d H:i:s'),
     ], $post_id);
 
-    // Must-update fields: Type
+    // Must-update fields: Type and barber
     update_field('appointment_type', $type, $post_id);
-    if ($barber > 0) update_field('appointment_barber', $barber, $post_id);
+    update_field('appointment_barber', $barber, $post_id);
 
     if ($type == "appointment") {
+
         //Service
         update_field('appointment_service', $data['serviceID'], $post_id);
 
-        if ($barber < 1 || $barber === "-1") {
-            $barbers = getBarbers(true);
-            $args = [
-                'post_type' => 'appointment',
-                'post_status' => 'publish',
-                'posts_per_page' => -1,
-                'meta_query' => [
-                    "relation" => "OR",
-                    [
-                        "relation" => "AND",
-                        [
-                            'key' => 'appointment_datetime_from',
-                            'value' => $datetimeFrom->format('Ymd H:i:s'),
-                            'compare' => '<',
-                            'type' => 'DATETIME',
-                        ],
-                        [
-                            'key' => 'appointment_datetime_to',
-                            'value' => $datetimeFrom->format('Ymd H:i:s'),
-                            'compare' => '>=',
-                            'type' => 'DATETIME',
-                        ]
-                    ],
-                    [
-                        "relation" => "AND",
-                        [
-                            'key' => 'appointment_datetime_from',
-                            'value' => $datetimeTo->format('Ymd H:i:s'),
-                            'compare' => '<',
-                            'type' => 'DATETIME',
-                        ],
-                        [
-                            'key' => 'appointment_datetime_to',
-                            'value' => $datetimeTo->format('Ymd H:i:s'),
-                            'compare' => '>=',
-                            'type' => 'DATETIME',
-                        ]
-                    ],
-                ]
-            ];
-            $reservations = new WP_Query($args);
-            if ($reservations->have_posts()) {
-                while ($reservations->have_posts()) {
-                    $reservations->the_post();
-                    $key = array_search(get_field("appointment_barber"), $barbers);
-                    if ($key) unset($key);
-                }
-                $barbers = array_values($barbers);
-                wp_reset_postdata();
-            }
-            $barber = $barbers[array_rand($barbers)];
-            update_field('appointment_barber', $barber, $post_id);
-        }
-
-
+        // Existing customer check
         $args = [
             'post_type' => 'customer',
             'post_status' => 'publish',
@@ -180,6 +127,7 @@ function update_appointment_fields($data, $barber, $post_id, $type)
             wp_reset_postdata();
         }
 
+        //If customer doesnt exist, create new one
         if (!isset($customerID)) {
             $args = [
                 'post_status' => 'publish',

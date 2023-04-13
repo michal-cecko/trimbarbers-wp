@@ -5,9 +5,7 @@ let gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     cleanCSS = require('gulp-clean-css'),
     rename = require('gulp-rename'),
-    uglify = require('gulp-uglify'),
-    ts = require("gulp-typescript"),
-    tsProject = ts.createProject("tsconfig.json");
+    uglify = require('gulp-uglify')
 
 sass.compiler = require('sass')
 

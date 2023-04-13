@@ -108,9 +108,9 @@ $services = new WP_Query($args);
                     <div class="content choose-time position-relative">
                         <div class="time-picker">
                             <div v-if="Object.keys(timeOptions).length"
-                                 v-for="(isAvailable, availableTime, index) in timeOptions"
+                                 v-for="(timeArray, availableTime, index) in timeOptions"
                                  class="time-container"
-                                 :class="[availableTime === time ? 'chosen' : '', (isAvailable === 0 ? 'unavailable' : '')]"
+                                 :class="[!empty(chosenTime) && availableTime === chosenTime.time ? 'chosen' : '', (timeArray.isAvailable === 0 ? 'unavailable' : '')]"
                                  @click="chooseTime(availableTime)">
                                 <div class="time" :class="getTimeClass(availableTime)"
                                      v-html="moment('2022-03-21T'+availableTime+':00').format('H:mm')"></div>

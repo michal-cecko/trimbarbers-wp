@@ -96,7 +96,7 @@ class Reservation extends Commons {
                     },
                     chooseTime(time) {
                         this.isVisibleOrder = true
-                        this.time = time
+                        this.chosenTime = {...this.timeOptions[time], time: time};
                     },
                     async changeStep(nextStep, returning = false) {
                         if (!this.canContinue(nextStep)) return false;
@@ -106,8 +106,12 @@ class Reservation extends Commons {
                             this.isVisibleOrder = false
                         }
 
-                        if (nextStep === 3 && !returning) {
-                            await this.loadDates()
+                        if (nextStep === 3) {
+                            if(!returning) {
+                                await this.loadDates()
+                            } else {
+                                this.chosenTime = null
+                            }
                         }
 
                         this.checkCustomStyle()
@@ -116,10 +120,13 @@ class Reservation extends Commons {
                     formatSelectedDatetime() {
                         let final = ""
                         final += moment(this.date).format('D. MMMM YYYY')
-                        if (this.time) {
-                            final += ', ' + moment('2022-03-21T' + this.time + ':00').format('H:mm')
+                        if (!_thisClass.empty(this.chosenTime)) {
+                            final += ', ' + moment('2022-03-21T' + this.chosenTime.time + ':00').format('H:mm')
                         }
                         return final
+                    },
+                    empty(variable) {
+                        return _thisClass.empty(variable)
                     },
                     canContinue(nextStep) {
                         //Naspäť možeš vždy
@@ -139,7 +146,7 @@ class Reservation extends Commons {
                         }
                         //Checknuť čas
                         else if (nextStep === 5) {
-                            if (!this.time) return false
+                            if (_thisClass.empty(this.chosenTime)) return false
                         }
                         //Checknuť kontaktné údaje
                         else if (nextStep === 6) {
@@ -211,7 +218,7 @@ class Reservation extends Commons {
                         this.sanitizePhone();
                         this.sanitizeEmail();
 
-                        if (!this.barber.id || !this.service.id || !this.time || !this.date) return false;
+                        if (!this.barber.id || !this.service.id || !this.chosenTime || !this.date) return false;
 
                         return !this.errors.length;
 
@@ -227,10 +234,10 @@ class Reservation extends Commons {
 
                         let data = new FormData();
                         data.append("customer", JSON.stringify(this.customer))
-                        data.append("barber", this.barber.id)
+                        data.append("barbers", JSON.stringify(this.chosenTime.barbers))
                         data.append("service", this.service.id)
                         data.append("date", this.date)
-                        data.append("time", this.time)
+                        data.append("time", this.chosenTime.time)
                         data.append("action", "make_reservation")
                         data.append("nonce", _thisClass.nonce)
                         this.sending = true;
@@ -300,7 +307,7 @@ class Reservation extends Commons {
                         this.sending = false;
                         this.saveCustomerToCookies = false
                         this.availableDates = {}
-                        this.time = null
+                        this.chosenTime = null
                         this.date = null
                         this.timeOptions = {}
                     },
@@ -328,7 +335,7 @@ class Reservation extends Commons {
                     },
                     service: {
                         handler(newService, oldService) {
-                            this.time = null
+                            this.chosenTime = null
                             this.date = null
                         },
                         deep: true
