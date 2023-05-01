@@ -30,6 +30,11 @@ function register_rest_routes()
             ),
         ),
     ));
+
+    register_rest_route('api/v1', '/generate-ics/', array(
+        'methods' => 'GET',
+        'callback' => 'generate_ics',
+    ));
 }
 
 function cancel_reservation_handler($request)
@@ -41,6 +46,24 @@ function cancel_reservation_handler($request)
     }
     wp_redirect(home_url(). "?c=1");
     exit();
+}
+
+function generate_ics($request)
+{
+    require_once get_template_directory() . '/classes/ICS.php';
+
+    $start = $request->get_param('s') ?? false;
+    $end = $request->get_param('e') ?? false;
+    $name = $request->get_param('n') ?? false;
+    $location = "SNP 1715 Krásno nad Kysucou";
+    $hashOK = $request->get_param("h") === '***REMOVED-ICS-HASH***';
+
+    if(!$start || !$name || !$end || !$hashOK) {
+        wp_send_json_error("Neboli definované potrebné dáta");
+    }
+
+    $ics = new ICS($start, $end, $name, "", $location);
+    $ics->show();
 }
 
 function notify_customers($request)
