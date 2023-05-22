@@ -106,14 +106,12 @@ $services = new WP_Query($args);
                         </div>
                     </div>
                     <div class="content choose-time position-relative">
-                        <div class="time-picker">
-                            <div v-if="Object.keys(timeOptions).length"
-                                 v-for="(timeArray, availableTime, index) in timeOptions"
-                                 class="time-container"
-                                 :class="[!empty(chosenTime) && availableTime === chosenTime.time ? 'chosen' : '', (timeArray.isAvailable === 0 ? 'unavailable' : '')]"
+                        <div class="time-picker" v-if="Object.keys(timeOptions).length">
+                            <div v-for="(timeArray, availableTime, index) in timeOptions" class="time-container"
+                                 :class="[!empty(chosenTime.time) && availableTime === chosenTime.time ? 'chosen' : '', (timeArray.isAvailable === 0 ? 'unavailable' : '')]"
                                  @click="chooseTime(availableTime)">
                                 <div class="time" :class="getTimeClass(availableTime)"
-                                     v-html="moment('2022-03-21T'+availableTime+':00').format('H:mm')"></div>
+                                     v-html="moment('2022-03-21T' + availableTime + ':00').format('H:mm')"></div>
                             </div>
                         </div>
                     </div>
@@ -134,13 +132,13 @@ $services = new WP_Query($args);
                             <div class="form-label">Poznámka</div>
                             <input type="text" v-model="customer.note">
                         </div>
-                        <!--                        <label for="saveCustomerToCookies" class="form-checkbox label-right">
+                        <label for="saveCustomerToCookies" class="form-checkbox label-right">
                             <input type="checkbox" v-model="saveCustomerToCookies" id="saveCustomerToCookies">
                             <span class="checkbox">
                                 <?= svgIcon(icon_path(false) . "/icon-check.svg") ?>
                             </span>
                             <span class="form-label">Uložiť údaje</span>
-                        </label>-->
+                        </label>
                     </div>
                 </div>
                 <div id="current-reservation"

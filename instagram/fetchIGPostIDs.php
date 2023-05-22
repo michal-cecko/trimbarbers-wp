@@ -28,13 +28,14 @@
 
     if(is_array($response) && !array_key_exists("error", $response) && array_key_exists("data", $response)){
 
-        $data = array_slice($response['data'], 0, 4);
+        $data = $response['data'];
         if(file_exists("posts")){
             delete_files("posts");
         }
         mkdir("posts", 0777, true);
         $i = 1;
         foreach ($data as $post) {
+            if($i > 4) break;
             $url = "https://graph.instagram.com/".$post['id']."?fields=media_type,media_url,thumbnail_url&access_token=".$token;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -50,15 +51,16 @@
             $mediaURL = $response['media_url'];
             $extension = pathinfo(parse_url($mediaURL, PHP_URL_PATH), PATHINFO_EXTENSION);
             if($extension == "mp4") {
-                $thumbnail = $response['thumbnail_url'];
-                file_put_contents("posts/".$i.".jpg", file_get_contents($thumbnail));
+                continue;
+                /*$thumbnail = $response['thumbnail_url'];
+                file_put_contents("posts/".$i.".jpg", file_get_contents($thumbnail));*/
             } else {
                 file_put_contents("posts/".$i.".jpg", file_get_contents($mediaURL));
+                $i++;
             }
 
             echo "imgHasBeenDownloaded? ";
             var_dump(file_exists("posts/".$i.".jpg"));
-            $i++;
         }
     }
 ?>

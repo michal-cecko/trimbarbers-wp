@@ -86,7 +86,7 @@ $btnText = get_field("home-ig-btn-text");
 $gallery = get_field("home-ig-slider");
 
 $showIGFeed = empty($gallery);
-if ($showIGFeed) $gallery = [];
+if($showIGFeed) $gallery = ['1.jpg', '2.jpg', '3.jpg', '4.jpg'];
 ?>
 
 <section id="instagramSection">
@@ -118,17 +118,17 @@ if ($showIGFeed) $gallery = [];
             <div class="col-md-9">
                 <div class="swiper swiper-gallery">
                     <div class="swiper-wrapper">
-                        <?php foreach ($gallery as $image) : ?>
+                        <?php $i = 1; foreach ($gallery as $image) : ?>
                             <?php
                             if(!$showIGFeed) $imgUrl = $image['url'];
-                            else $imgUrl = get_template_directory_uri() . "instagram/posts/" . $image['url'];
+                            else $imgUrl = get_template_directory_uri() . "/instagram/posts/" . $image;
                             ?>
                             <div class="swiper-slide">
                                 <a <?= $showIGFeed ? 'href="' . $address['instagram'] . '"' : "" ?> class="img-container">
                                     <img src="<?= $imgUrl ?>" alt="">
                                 </a>
                             </div>
-                        <?php endforeach ?>
+                        <?php $i++; endforeach ?>
                     </div>
                 </div>
             </div>

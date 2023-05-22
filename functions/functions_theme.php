@@ -1,5 +1,5 @@
 <?php
-const WP_VERSIONING = TRUE;
+const WP_VERSIONING = FALSE;
 $version = wp_get_theme()->get("Version") ?? "1.0.0";
 DEFINE("VERSION", !WP_VERSIONING ? time() : $version);
 

@@ -51,9 +51,18 @@ class Reservation extends Commons {
                     container: null,
                     contentContainer: null,
                     cards: {},
+
+                    chosenTime: {},
                 },
                 created() {
                     console.log(`Reservation Vue component has been created.`)
+                    let savedCustomerInfo = _thisClass.getCookie("saved-info")
+                    if(savedCustomerInfo) {
+                        savedCustomerInfo = JSON.parse(savedCustomerInfo)
+                        this.customer.name = savedCustomerInfo.name
+                        this.customer.phone = savedCustomerInfo.phone
+                        this.customer.email = savedCustomerInfo.email
+                    }
                     this.defaultService()
                 },
                 mounted() {
@@ -110,7 +119,7 @@ class Reservation extends Commons {
                             if(!returning) {
                                 await this.loadDates()
                             } else {
-                                this.chosenTime = null
+                                this.chosenTime = {}
                             }
                         }
 
@@ -256,11 +265,18 @@ class Reservation extends Commons {
                             await _thisClass.delay(1500);
                             this.isModalVisible = false;
                             await _thisClass.delay(500);
+                            if(this.saveCustomerToCookies) {
+                                this.saveContactInfoToCookie()
+                            }
                             this.resetReservation()
                         } catch (error) {
                             console.error(error);
                             return null;
                         }
+                    },
+                    saveContactInfoToCookie() {
+                        this.customer.note = ""
+                        _thisClass.setCookie("saved-info", JSON.stringify(this.customer), 365)
                     },
                     hasError(name) {
                         return this.step === 5 && this.errors.indexOf(name) !== -1
@@ -294,7 +310,17 @@ class Reservation extends Commons {
                         return _thisClass.getMonthName(num)
                     },
                     getTimeClass(time) {
-                        return ""
+                        const now = moment(time, 'HH:mm');
+                        const morningEnd = moment('12:00', 'HH:mm');
+                        const afternoonEnd = moment('17:00', 'HH:mm');
+
+                        if (now.isBefore(morningEnd)) {
+                            return "morning";
+                        } else if (now.isBefore(afternoonEnd)) {
+                            return "afternoon";
+                        } else {
+                            return "evening";
+                        }
                     },
                     resetReservation() {
                         this.defaultService()
@@ -307,7 +333,7 @@ class Reservation extends Commons {
                         this.sending = false;
                         this.saveCustomerToCookies = false
                         this.availableDates = {}
-                        this.chosenTime = null
+                        this.chosenTime = {}
                         this.date = null
                         this.timeOptions = {}
                     },
@@ -324,7 +350,7 @@ class Reservation extends Commons {
                         }
                         this.contentContainer.style.transform = style;
                         console.log(this.contentContainer.style.transform)
-                    }
+                    },
                 },
                 watch: {
                     barber: {
@@ -335,7 +361,7 @@ class Reservation extends Commons {
                     },
                     service: {
                         handler(newService, oldService) {
-                            this.chosenTime = null
+                            this.chosenTime = {}
                             this.date = null
                         },
                         deep: true

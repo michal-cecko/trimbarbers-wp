@@ -1,13 +1,13 @@
 // Fonts
 @import "core/fonts";
 
+// Vendor Files
+@import "vendor/bootstrap-utilities.scss";
+
 // Abstract files
 @import "abstracts/breakpoints";
 @import "abstracts/mixins";
 @import "abstracts/variables";
-
-// Vendor Files
-@import "vendor/bootstrap-utilities.css";
 
 // Core files
 @import "core/defaults";

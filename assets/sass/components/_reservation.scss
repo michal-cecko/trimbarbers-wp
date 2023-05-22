@@ -421,7 +421,8 @@
             display: flex;
             cursor: pointer;
             align-items: center;
-            padding: 0.375rem 0.375rem 0.375rem 0.875rem;
+            justify-content: center;
+            padding: 0.375rem;
 
             .time {
               font-size: 0.8rem;
@@ -429,6 +430,38 @@
               line-height: 0.95rem;
               color: $tertiaryBlack;
               transition: all 0.3s ease;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              &::before{
+                margin-right: 0.35rem;
+                content: "";
+                display: block;
+                width: 1.3rem;
+                height: 1.3rem;
+                background-repeat: no-repeat;
+              }
+              &.morning{
+                &::before {
+                  background-size: 1.25rem auto;
+                  background-position: 2px 3px;
+                  background-image: url('../../assets/icons/icon-sunrise.svg');
+                }
+              }
+              &.afternoon{
+                &::before {
+                  background-size: 1.1rem auto;
+                  background-position: 4px 1px;
+                  background-image: url('../../assets/icons/icon-sun.svg');
+                }
+              }
+              &.evening{
+                &::before {
+                  background-size: 0.9rem auto;
+                  background-position: 6.5px 3px;
+                  background-image: url('../../assets/icons/icon-moon.svg');
+                }
+              }
             }
 
             &.chosen {
@@ -437,6 +470,9 @@
 
               .time {
                 color: $primaryWhite;
+                &::before{
+                  filter: brightness(0) invert(1);
+                }
               }
             }
             &.unavailable{
