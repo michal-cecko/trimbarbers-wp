@@ -368,6 +368,7 @@
                         $start = $date->format("Y-m-d H:i");
                         $date = $date->modify("+" . $serviceDuration . " minutes");
                         $end = $date->format("Y-m-d H:i");
+
                         $icsLink = home_url() . "/wp-json/api/v1/generate-ics?s=" . $start . "&e=" . $end . "&n=3M Barbers rezervácia - " . $serviceTitle . "&h=***REMOVED-ICS-HASH***";
                     ?>
 

@@ -55,7 +55,7 @@ function generate_ics($request)
     $start = $request->get_param('s') ?? false;
     $end = $request->get_param('e') ?? false;
     $name = $request->get_param('n') ?? false;
-    $location = "SNP 1715 Krásno nad Kysucou";
+    $location = "A. Bernoláka 8316/48A, 010 01 Žilina";
     $hashOK = $request->get_param("h") === '***REMOVED-ICS-HASH***';
 
     if(!$start || !$name || !$end || !$hashOK) {

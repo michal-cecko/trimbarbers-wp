@@ -139,7 +139,7 @@ class ReservationCalendar extends Commons {
                         selectOverlap: true,
                         eventResizableFromStart: false,
                         initialView: 'timeGridWeek',
-
+                        rerenderDelay: 500,
                         headerToolbar: {
                             left: 'prev,next today',
                             center: 'title',
