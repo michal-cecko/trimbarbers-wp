@@ -121,8 +121,13 @@ foreach ($barbers as $barber) {
                              :class="appointment.type === 'appointment' ? 'col-md-6' : ''">
                             <div class="field-container mb-3">
                                 <label for="service">Služba</label>
-                                <select v-model="appointment.serviceID" class="form-control" id="service">
-                                    <option value="" selected>Vyberte službu</option>
+                                <?php
+                                    $services->the_post();
+                                    $first_service_id = get_the_ID();
+                                    $first_service_title = get_the_title();
+                                ?>
+                                <select v-model="appointment.serviceID" class="form-control" id="service" data-defaultvalue="<?= $first_service_id ?>">
+                                    <option value="<?= $first_service_id ?>"><?= $first_service_title ?></option>
                                     <?php if ($services->have_posts()) : ?>
                                         <?php while ($services->have_posts()) : $services->the_post() ?>
                                             <option value="<?= get_the_ID() ?>"><?= get_the_title() ?></option>

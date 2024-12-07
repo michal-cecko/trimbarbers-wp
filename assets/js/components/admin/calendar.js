@@ -98,6 +98,7 @@ class ReservationCalendar extends Commons {
 
                 this.serviceColors = JSON.parse(document.getElementById('services-colors').dataset.colors)
                 this.serviceDurations = JSON.parse(document.getElementById('services-durations').dataset.durations)
+
                 this.initCalendar()
             },
             methods: {
@@ -530,7 +531,7 @@ class ReservationCalendar extends Commons {
                         customer: {},
                         datetime: {},
                         type: "appointment",
-                        serviceID: "",
+                        serviceID: document.getElementById('service').dataset.defaultvalue,
                     }
                 },
 

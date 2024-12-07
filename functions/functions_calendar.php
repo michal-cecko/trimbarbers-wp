@@ -20,6 +20,12 @@ function make_appointment()
         ], 403);
     }
 
+    if($type !== "free" && empty($appointment['serviceID'])) {
+        wp_send_json([
+            'message' => "ID služby nebolo nastavené."
+        ], 403);
+    }
+
     $args = [
         'post_status' => 'publish',
         'post_type' => 'appointment',
