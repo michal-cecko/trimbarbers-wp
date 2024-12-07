@@ -283,7 +283,12 @@
                         <?php endif ?>
 
                     <?php else : ?>
-                        Dobrý deň, je nám to ľúto, ale Vaša rezervácia bola zrušená.<br><br>
+                        <?php if ($type === "cancel-customer") : ?>
+                            Dobrý deň, na základe vášho podnetu bola Vaša registrácia zrušená.<br><br>
+                        <?php else : ?>
+                            Dobrý deň, je nám to ľúto, ale Vaša rezervácia bola zrušená.<br><br>
+                        <?php endif ?>
+
                         <b>DETAILY VAŠEJ REZERVÁCIE</b><br>
                         <b>Dátum a čas</b>: <?= $date->format("j.n.Y - H:i") ?><br>
                         <b>Miesto</b>: A. Bernoláka 8316/48A, Žilina<br>
