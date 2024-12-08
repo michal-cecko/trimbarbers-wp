@@ -101,7 +101,7 @@ class Reservation extends Commons {
                     chooseDate(date) {
                         this.isVisibleOrder = true
                         this.date = date
-                        this.timeOptions = this.availableDates[moment(date).format("M")][date]['apps']
+                        this.timeOptions = this.availableDates[moment(date).format("YYYY")][moment(date).format("M")][date]['apps']
                     },
                     chooseTime(time) {
                         this.isVisibleOrder = true

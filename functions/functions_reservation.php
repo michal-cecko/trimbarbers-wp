@@ -36,6 +36,8 @@ function get_available_dates()
 
         $worktime = get_field("worktime", "user_" . $barber->ID);
         $lunchtime = get_field("lunchtime", "user_" . $barber->ID);
+        $weekendWork = get_field('weekend_work', "user_" . $barber->ID) ?? ['saturday' => false, 'sunday' => false];
+
 
         $args = [
             'post_type' => 'appointment',
@@ -75,10 +77,44 @@ function get_available_dates()
             while ($reservations->have_posts()) : $reservations->the_post();
                 $datetime = get_field("appointment_datetime", get_the_ID());
 
-                $start = DateTime::createFromFormat("Y-m-d H:i:s", $datetime['from']);
-                $end = DateTime::createFromFormat("Y-m-d H:i:s", $datetime['to']);
+                $startAt = DateTime::createFromFormat("Y-m-d H:i:s", $datetime['from']);
+                $endAt = DateTime::createFromFormat("Y-m-d H:i:s", $datetime['to']);
 
-                $obsadeneArr[$start->format("Y-m-d")][] = ['start' => $start->format("H:i"), "end" => $end->format("H:i")];
+                if ($startAt->format('Y-m-d') !== $endAt->format('Y-m-d')) {
+                    $currentDay = clone $startAt;
+                    $endOfDay = clone $currentDay;
+                    $endOfDay->setTime(23, 59, 59);
+                    $startOfEndDay = clone $endAt;
+                    $startOfEndDay->setTime(0, 0, 0);
+
+                    // First day
+                    $obsadeneArr[$currentDay->format("Y-m-d")][] = [
+                        'start' => $startAt->format("H:i"),
+                        'end' => $endOfDay->format("H:i")
+                    ];
+
+                    // Intermediate days
+                    $currentDay->add(new DateInterval('P1D'))->setTime(0, 0, 0);
+                    while ($currentDay < $startOfEndDay) {
+                        $obsadeneArr[$currentDay->format("Y-m-d")][] = [
+                            'start' => '00:00',
+                            'end' => '23:59'
+                        ];
+                        $currentDay->add(new DateInterval('P1D'));
+                    }
+
+                    // Last day
+                    $obsadeneArr[$endAt->format("Y-m-d")][] = [
+                        'start' => '00:00',
+                        'end' => $endAt->format("H:i")
+                    ];
+                } else {
+                    $obsadeneArr[$startAt->format("Y-m-d")][] = [
+                        'start' => $startAt->format("H:i"),
+                        'end' => $endAt->format("H:i")
+                    ];
+                }
+
             endwhile;
             wp_reset_postdata();
         endif;
@@ -88,10 +124,19 @@ function get_available_dates()
         for ($i = 0; $i < 60; $i++) :
             $date = $currentDate->modify("+1 day");
             $dateFormat = $currentDate->format("Y-m-d");
-            if (in_array($date->format("N"), [6, 7])) {
-                $finalDates[$currentDate->format("n")][$dateFormat] = [];
+
+            //Saturday work
+            if (!($weekendWork['saturday'] ?? false) && (int)$date->format("N") === 6) {
+                $finalDates[$currentDate->format("Y")][$currentDate->format("n")][$dateFormat] = ['apps' => [], 'isAvailable' => 0];
                 continue;
             };
+
+            //Sunday work
+            if (!($weekendWork['sunday'] ?? false) && (int)$date->format("N") === 7) {
+                $finalDates[$currentDate->format("Y")][$currentDate->format("n")][$dateFormat] = ['apps' => [], 'isAvailable' => 0];
+                continue;
+            };
+
             $currentDate = $date;
             //echo "currentDate: " . $date->format("d.m.Y") . "<br>";
             $obsadene = $obsadeneArr[$dateFormat] ?? false;
@@ -136,7 +181,7 @@ function get_available_dates()
                 }
 
                 $timeToAdd = [];
-                $termin = $finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart] ?? [];
+                $termin = $finalDates[$currentDate->format("Y")][$currentDate->format("n")][$dateFormat]['apps'][$currentStart] ?? [];
 
                 // termin is available
                 if ($ok) {
@@ -153,16 +198,16 @@ function get_available_dates()
                     if(!empty($termin) && !empty($termin['barbers'])) {
                         $timeToAdd['barbers'] = array_merge($timeToAdd['barbers'], $termin['barbers']);
                     }
-                    $finalDates[$currentDate->format("n")][$dateFormat]['apps'][$currentStart] = $timeToAdd;
+                    $finalDates[$currentDate->format("Y")][$currentDate->format("n")][$dateFormat]['apps'][$currentStart] = $timeToAdd;
                 }
 
-                if($finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'] != 1 && $ok) {
-                    $finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'] = 1;
+                if($finalDates[$currentDate->format("Y")][$currentDate->format("n")][$dateFormat]['isAvailable'] != 1 && $ok) {
+                    $finalDates[$currentDate->format("Y")][$currentDate->format("n")][$dateFormat]['isAvailable'] = 1;
                 }
             endwhile;
 
-            if(!isset($finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'])) {
-                $finalDates[$currentDate->format("n")][$dateFormat]['isAvailable'] = 0;
+            if(!isset($finalDates[$currentDate->format("Y")][$currentDate->format("n")][$dateFormat]['isAvailable'])) {
+                $finalDates[$currentDate->format("Y")][$currentDate->format("n")][$dateFormat]['isAvailable'] = 0;
             }
         endfor;
 
