@@ -88,6 +88,28 @@ function notify_customers($request)
                     'value' => "appointment",
                     'compare' => '='
                 ],
+                [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'has_been_reminded',
+                        'compare' => 'NOT EXISTS'
+                    ],
+                    [
+                        'key' => 'has_been_reminded',
+                        'value' => '',
+                        'compare' => '='
+                    ],
+                    [
+                        'key' => 'has_been_reminded',
+                        'value' => false,
+                        'compare' => '='
+                    ],
+                    [
+                        'key' => 'has_been_reminded',
+                        'value' => 0,
+                        'compare' => '='
+                    ]
+                ]
             ],
         ];
         $reservations = new WP_Query($args);
@@ -95,8 +117,6 @@ function notify_customers($request)
             while ($reservations->have_posts()) {
                 $reservations->the_post();
                 $id = get_the_ID();
-
-                if(in_array(get_post_meta($id, 'has_been_reminded', true), [true, 1])) continue;
 
                 $receiver = get_field("appointment_customer_email", $id);
                 if (!empty($receiver)) reservation_notification($receiver, "notification", $id);
