@@ -1,9 +1,6 @@
 import Commons from "../commons.js"
-import {Calendar} from 'https://cdn.skypack.dev/@fullcalendar/core@6.1.4'
-import timeGridPlugin from 'https://cdn.skypack.dev/@fullcalendar/timegrid@6.1.4'
-import dayGridPlugin from 'https://cdn.skypack.dev/@fullcalendar/daygrid@6.1.4'
-import interactionPlugin from 'https://cdn.skypack.dev/@fullcalendar/interaction@6.1.4'
-import skLocale from 'https://cdn.skypack.dev/@fullcalendar/core/locales/sk'
+
+const {Calendar} = window.FullCalendar
 
 class ReservationCalendar extends Commons {
 
@@ -106,24 +103,15 @@ class ReservationCalendar extends Commons {
                     this.shownOptions = false
                 },
 
-                getResources() {
-                    let toReturn = [];
-                    this.barbers.forEach(barber => {
-                        toReturn.push({id: barber.id, title: barber.name})
-                    })
-                    return toReturn
-                },
-
                 async initCalendar() {
                     let _thisVue = this
 
                     let now = _thisClass.getCurrentTimestamp()
-                    let appointments = await this.fetchAppointments(now, this.chosenBarberOnView, "week");
+                    let appointments = await this.fetchAppointments(now, this.chosenBarberOnView, "timeGridWeek");
 
                     const calendarEl = document.getElementById('calendar')
                     let calendar = new Calendar(calendarEl, {
-                        plugins: [timeGridPlugin, dayGridPlugin, interactionPlugin],
-                        locale: skLocale,
+                        locale: 'sk',
                         nowIndicator: true,
                         select: function (info) {
                             // Show the modal
@@ -244,18 +232,6 @@ class ReservationCalendar extends Commons {
                         eventDrop: false,
                         eventResize: false,
                         events: appointments,
-
-                        viewDidMount: async function (view) {
-                            let start = calendar.view.currentStart
-                            let end = calendar.view.currentEnd
-
-                            _thisVue.dateRange.start = start
-                            _thisVue.dateRange.end = end
-
-                            let fetchStart = _thisClass.utc(moment(start).add(1, "hour"))
-                            let appointments = await _thisVue.fetchAppointments(fetchStart, _thisVue.chosenBarberOnView, view.type)
-                            _thisVue.exchangeAppointmentsOnView(appointments)
-                        }
                     })
                     calendar.on('datesSet', async function (info) {
                         if (!_thisVue.hasInit) return;
@@ -291,6 +267,11 @@ class ReservationCalendar extends Commons {
                     try {
                         this.buttonLoader = true;
                         let response = await _thisClass.WPPostAjax(data);
+                        if (!response.ok) {
+                            console.error("make_appointment failed:", response.status, await response.text());
+                            this.buttonLoader = false;
+                            return false;
+                        }
                         let responseData = await response.json();
 
                         this.calendar.addEvent({
@@ -318,6 +299,7 @@ class ReservationCalendar extends Commons {
                         return true;
                     } catch (error) {
                         console.error(error);
+                        this.buttonLoader = false;
                         return false;
                     }
                 },
@@ -338,6 +320,11 @@ class ReservationCalendar extends Commons {
                     try {
                         this.buttonLoader = true;
                         let response = await _thisClass.WPPostAjax(data);
+                        if (!response.ok) {
+                            console.error("edit_appointment failed:", response.status, await response.text());
+                            this.buttonLoader = false;
+                            return false;
+                        }
                         let responseData = await response.json();
 
                         this.editingAppointment.remove();
@@ -368,6 +355,7 @@ class ReservationCalendar extends Commons {
                         return true;
                     } catch (error) {
                         console.error(error);
+                        this.buttonLoader = false;
                         return false;
                     }
                 },
@@ -381,14 +369,18 @@ class ReservationCalendar extends Commons {
                     try {
                         this.buttonLoader = true;
                         let response = await _thisClass.WPPostAjax(data)
-                        response = await response.json();
+                        if (!response.ok) {
+                            console.error("remove_appointment failed:", response.status, await response.text());
+                            this.buttonLoader = false;
+                            return null;
+                        }
                         this.appointmentToDelete.remove()
                         this.deleteModal.hide();
                         this.notify = false;
                         this.buttonLoader = false;
-                        console.log(response)
                     } catch (error) {
                         console.error(error);
+                        this.buttonLoader = false;
                         return null;
                     }
                 },
@@ -513,7 +505,7 @@ class ReservationCalendar extends Commons {
                     let type = appToEdit.extendedProps.type
 
                     if (type !== "free") {
-                        this.appointment.customer = appToEdit.extendedProps.customer
+                        this.appointment.customer = {...appToEdit.extendedProps.customer}
                         this.appointment.serviceID = appToEdit.extendedProps.serviceID
                     }
                     this.chosenBarberInForms = appToEdit.extendedProps.barberID

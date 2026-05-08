@@ -239,6 +239,10 @@ function admin_enqueue_scripts()
     //COMPONENTS
     enqueue_component("ajax", $defaultPHPVars);
 
+    //FullCalendar (vendored locally — no CDN)
+    wp_enqueue_script('fullcalendar-js', script_path() . '/libs/fullcalendar/index.global.min.js', [], '6.1.4', true);
+    wp_enqueue_script('fullcalendar-sk', script_path() . '/libs/fullcalendar/locales/sk.global.js', ['fullcalendar-js'], '6.1.4', true);
+
     //CALENDAR WITH SK LOCALE
     enqueue_component("admin/calendar");
 }
