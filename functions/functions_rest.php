@@ -56,7 +56,7 @@ function generate_ics($request)
     $end = $request->get_param('e') ?? false;
     $name = $request->get_param('n') ?? false;
     $location = "A. Bernoláka 8316/48A, 010 01 Žilina";
-    $hashOK = $request->get_param("h") === '***REMOVED-ICS-HASH***';
+    $hashOK = defined('ICS_HASH') && $request->get_param("h") === ICS_HASH;
 
     if(!$start || !$name || !$end || !$hashOK) {
         wp_send_json_error("Neboli definované potrebné dáta");
@@ -70,7 +70,7 @@ function notify_customers($request)
 {
     ini_set("max_execution_time", 999999);
     $token = $request->get_param('t');
-    if ($token === "***REMOVED-NOTIFY-TOKEN***") {
+    if (defined('NOTIFY_CUSTOMERS_TOKEN') && $token === NOTIFY_CUSTOMERS_TOKEN) {
         $date = (new DateTime())->modify("+1 day");
         $args = [
             'post_type' => 'appointment',

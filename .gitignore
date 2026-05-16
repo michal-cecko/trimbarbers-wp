@@ -49,3 +49,7 @@ Thumbs.db
 *.wmv
 
 instagram/posts/*
+
+# Auto-generated / sensitive — never commit
+instagram/accessToken.json
+.playwright-mcp/
