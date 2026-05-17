@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="col-12 copyright">
-                    2023 © 3M Barbers. Všetky práva vyhradené. Made by <a style="color: #ccc" href="https://synapps.sk">Synapps</a>
+                    2023 © 3M Barbers. Všetky práva vyhradené. Made by <a style="color: #ccc" href="https://cecko.dev" target="_blank" rel="noopener">Michal Čečko</a>
                 </div>
             </div>
             <div class="col-md-2 order-0 order-md-1 logo">
